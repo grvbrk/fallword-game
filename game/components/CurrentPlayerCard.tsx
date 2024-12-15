@@ -16,7 +16,7 @@ export default function CurrentPlayerCard({ currentUser }: { currentUser: UserRe
           className="transition-all duration-300 ease-out group-hover:scale-[0.95] group-hover:opacity-50 group-hover:blur-sm"
         />
         <div className="absolute inset-0 flex items-center justify-center truncate text-[#fc6] opacity-0 transition-all duration-300 ease-out group-hover:scale-[1.05] group-hover:opacity-100">
-          {currentUser.name ?? null}
+          {currentUser.name ? 'u/' + currentUser.name : null}
         </div>
       </CardHeader>
 

@@ -4,9 +4,15 @@ import { Card } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { ScrollArea } from './ui/scroll-area';
 import { Separator } from './ui/separator';
-import { LeaderboardDataType } from '../shared';
+import { LeaderboardDataType, UserRecord } from '../shared';
 
-export default function LeaderBoard({ leaderboard }: { leaderboard: LeaderboardDataType }) {
+export default function LeaderBoard({
+  leaderboard,
+  currentUser,
+}: {
+  leaderboard: LeaderboardDataType;
+  currentUser: UserRecord;
+}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -23,54 +29,49 @@ export default function LeaderBoard({ leaderboard }: { leaderboard: LeaderboardD
           </TabsList>
           <TabsContent value="singleplayer" className="select-none">
             <Card>
-              <div className="flex w-full items-center justify-evenly gap-4">
-                <h4 className="m-4 w-24 text-center text-sm font-medium">Rank</h4>
-                <h4 className="m-4 w-40 text-center text-sm font-medium">Player</h4>
-                <h4 className="m-4 w-24 text-center text-sm font-medium">Games</h4>
-                <h4 className="m-4 w-24 text-center text-sm font-medium">Wins</h4>
+              <div className="grid w-full grid-cols-4 place-items-center gap-4 p-4 text-center text-sm font-medium">
+                <h4>Rank</h4>
+                <h4>Player</h4>
+                <h4>Games</h4>
+                <h4>Wins</h4>
               </div>
-              <ScrollArea className="h-60 rounded-md">
-                <div className="p-4">
-                  {leaderboard.singleplayer.map((user, idx) => (
-                    <div className="flex flex-wrap items-center justify-evenly gap-4" key={idx}>
-                      <div className="max-w-24 text-sm">{idx + 1}</div>
-                      <div className="max-w-24 truncate text-sm">{user.member} name</div>
-                      <div className="max-w-24 text-sm">Games Data</div>
-                      <div className="max-w-24 text-sm">{user.score}</div>
-                      <Separator className="my-2" />
-                    </div>
-                  ))}
-                </div>
+              <ScrollArea className="h-60 rounded-md p-4">
+                {leaderboard.singleplayer.map((user, idx) => (
+                  <div
+                    className="grid w-full grid-cols-4 place-items-center gap-4 text-center text-sm"
+                    key={idx}
+                  >
+                    <div className="w-full truncate">{idx + 1}</div>
+                    <div className="w-full truncate">{'u/' + user.member}</div>
+                    <div className="w-full truncate">{currentUser.singleplayermatches}</div>
+                    <div className="w-full truncate">{user.score}</div>
+                    <Separator className="my-2" />
+                  </div>
+                ))}
               </ScrollArea>
             </Card>
           </TabsContent>
           <TabsContent value="multiplayer" className="select-none">
             <Card>
-              <div className="flex w-full items-center justify-evenly gap-4">
-                <h4 className="m-4 w-24 text-center text-sm font-medium">Rank</h4>
-                <h4 className="m-4 w-40 text-center text-sm font-medium">Player</h4>
-                <h4 className="m-4 w-24 text-center text-sm font-medium">Games</h4>
-                <h4 className="m-4 w-24 text-center text-sm font-medium">Wins</h4>
+              <div className="grid w-full grid-cols-4 place-items-center gap-4 p-4 text-center text-sm font-medium">
+                <h4>Rank</h4>
+                <h4>Player</h4>
+                <h4>Games</h4>
+                <h4>Wins</h4>
               </div>
-              <ScrollArea className="h-60 rounded-md">
-                <div className="p-4">
-                  {/* <div className="flex flex-wrap items-center justify-evenly gap-4">
-                    <div className="max-w-24 text-sm">{1}</div>
-                    <div className="max-w-24 truncate text-sm">{'user.member'} name</div>
-                    <div className="max-w-24 text-sm">Games Data</div>
-                    <div className="max-w-24 text-sm">{898}</div>
+              <ScrollArea className="h-60 rounded-md p-4">
+                {leaderboard.multiplayer.map((user, idx) => (
+                  <div
+                    className="grid w-full grid-cols-4 place-items-center gap-4 text-center text-sm"
+                    key={idx}
+                  >
+                    <div className="w-full truncate">{idx + 1}</div>
+                    <div className="w-full truncate">{'u/' + user.member}</div>
+                    <div className="w-full truncate">{currentUser.multiplayermatches}</div>
+                    <div className="w-full truncate">{user.score}</div>
                     <Separator className="my-2" />
-                  </div> */}
-                  {leaderboard.multiplayer.map((user, idx) => (
-                    <div className="flex flex-wrap items-center justify-evenly gap-4" key={idx}>
-                      <div className="max-w-24 text-sm">{idx + 1}</div>
-                      <div className="max-w-24 truncate text-sm">{user.member} name</div>
-                      <div className="max-w-24 text-sm">Games Data</div>
-                      <div className="max-w-24 text-sm">{user.score}</div>
-                      <Separator className="my-2" />
-                    </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </ScrollArea>
             </Card>
           </TabsContent>

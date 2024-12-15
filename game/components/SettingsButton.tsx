@@ -7,6 +7,7 @@ type NavigationButtonProps = {
   currentIndex: number;
   onChange: (newIndex: number) => void;
   label: string;
+  disabled?: boolean;
 };
 
 export function SettingsButton() {
@@ -40,6 +41,8 @@ export function SettingsButton() {
     }));
   }
 
+  const isMultiplayerMode = gameSettings.mode === 'multiplayer';
+
   return (
     <div>
       <Popover>
@@ -54,6 +57,7 @@ export function SettingsButton() {
             currentIndex={difficultyIndex}
             onChange={handleDifficultyChange}
             label="Difficulty"
+            disabled={isMultiplayerMode}
           />
 
           <NavigationButton
@@ -68,6 +72,7 @@ export function SettingsButton() {
             currentIndex={timerIndex}
             onChange={handleTimerChange}
             label="Timer"
+            disabled={isMultiplayerMode}
           />
         </PopoverContent>
       </Popover>
@@ -75,23 +80,42 @@ export function SettingsButton() {
   );
 }
 
-function NavigationButton({ options, currentIndex, onChange, label }: NavigationButtonProps) {
+function NavigationButton({
+  options,
+  currentIndex,
+  onChange,
+  label,
+  disabled = false,
+}: NavigationButtonProps) {
   const handlePrevious = () => {
+    if (disabled) return;
     onChange(currentIndex === 0 ? options.length - 1 : currentIndex - 1);
   };
 
   const handleNext = () => {
+    if (disabled) return;
     onChange((currentIndex + 1) % options.length);
   };
 
   return (
-    <div className="flex items-center justify-between px-2">
-      <span className="font-medium text-black">{label}</span>
+    <div
+      className={`flex items-center justify-between px-2 ${disabled ? 'cursor-not-allowed opacity-40' : ''}`}
+    >
+      <span className={`font-medium ${disabled ? 'text-gray-500' : 'text-black'}`}>{label}</span>
       <div className="flex items-center justify-center gap-4">
-        <ChevronLeft className="h-5 w-5 cursor-pointer text-black" onClick={handlePrevious} />
-        <span className="w-24 text-center font-medium text-black">{options[currentIndex]}</span>
-
-        <ChevronRight className="h-5 w-5 cursor-pointer text-black" onClick={handleNext} />
+        <ChevronLeft
+          className={`h-5 w-5 ${disabled ? 'cursor-not-allowed text-gray-500' : 'cursor-pointer text-black'}`}
+          onClick={handlePrevious}
+        />
+        <span
+          className={`w-24 text-center font-medium ${disabled ? 'text-gray-500' : 'text-black'}`}
+        >
+          {options[currentIndex]}
+        </span>
+        <ChevronRight
+          className={`h-5 w-5 ${disabled ? 'cursor-not-allowed text-gray-500' : 'cursor-pointer text-black'}`}
+          onClick={handleNext}
+        />
       </div>
     </div>
   );

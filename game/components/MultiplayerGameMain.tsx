@@ -63,18 +63,16 @@ export default function MultiplayerGameMain() {
         0,
         user.userQuestions[currentLevel - 1].timeInSeconds - timeRemaining
       );
-
       if (currentLevel < 5) {
         // Not the final level, always progress
         const newUserState = {
           ...user,
           userLevel: currentLevel + 1,
           score: user.score + (isLevelWon ? 1 : 0),
-          gameStatus: 'in-progress' as 'waiting' | 'in-progress' | 'won' | 'lost',
+          gameStatus: 'in-progress' as 'waiting' | 'in-progress' | 'finished',
           timeTaken: user.timeTaken + timeTakenInCurrentLevel,
         };
         updateUserState(newUserState);
-
         // Reset game state for next level
         setGuessedLetters([]);
         setLives(5);
@@ -85,7 +83,7 @@ export default function MultiplayerGameMain() {
           ...user,
           userLevel: currentLevel,
           score: user.score + (isLevelWon ? 1 : 0),
-          gameStatus: (isLevelWon ? 'won' : 'lost') as 'waiting' | 'in-progress' | 'won' | 'lost',
+          gameStatus: (isLevelWon && 'finished') as 'waiting' | 'in-progress' | 'finished',
           isGameOver: true,
           timeTaken: user.timeTaken + timeTakenInCurrentLevel,
         };
@@ -99,32 +97,33 @@ export default function MultiplayerGameMain() {
   }
 
   if (user.isGameOver) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Card className="bg-[#fc6] text-black">
-          <CardHeader>
-            <CardTitle>Game Over</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Final Score: {user.score}</p>
-            <p>Game Status: {user.gameStatus}</p>
-            <p>Time Taken: {user.timeTaken} seconds</p>
-          </CardContent>
-          <CardFooter className="flex w-[350px] items-center justify-center gap-4 border-none p-4 shadow-none">
-            <Button
-              className="bg-[#fc6]"
-              onClick={() => {
-                reset();
-                setPage('home');
-              }}
-            >
-              <MoveLeft />
-              Return to Main Menu
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    );
+    return null;
+    // return (
+    // <div className="flex h-full items-center justify-center">
+    //   <Card className="bg-[#fc6] text-black">
+    //     <CardHeader>
+    //       <CardTitle>Game Over</CardTitle>
+    //     </CardHeader>
+    //     <CardContent>
+    //       <p>Final Score: {user.score}</p>
+    //       <p>Game Status: {user.gameStatus}</p>
+    //       <p>Time Taken: {user.timeTaken} seconds</p>
+    //     </CardContent>
+    //     <CardFooter className="flex w-[350px] items-center justify-center gap-4 border-none p-4 shadow-none">
+    //       <Button
+    //         className="bg-black text-[#fc6] hover:bg-black hover:text-[#fc6]"
+    //         onClick={() => {
+    //           reset();
+    //           setPage('home');
+    //         }}
+    //       >
+    //         <MoveLeft />
+    //         Return to Main Menu
+    //       </Button>
+    //     </CardFooter>
+    //   </Card>
+    // </div>
+    // );
   }
 
   return (
