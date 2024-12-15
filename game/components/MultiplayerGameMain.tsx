@@ -1,6 +1,6 @@
 import { Heart, MoveLeft } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
-import { isVowel } from '../utils';
+import { isVowel, sendToDevvit } from '../utils';
 import AlphabetList from './AlphabetList';
 import { AlphabetSlot } from './AlphabetSlot';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from './ui/card';
@@ -77,6 +77,20 @@ export default function MultiplayerGameMain() {
         setGuessedLetters([]);
         setLives(5);
         setTimeRemaining(user.userQuestions[currentLevel].timeInSeconds);
+        const updatedUser = useGameStore.getState().user;
+        sendToDevvit({
+          type: 'OPPONENT_GAME_UPDATES_REQUEST',
+          payload: {
+            matchId: updatedUser.matchId as string,
+            currentUserId: updatedUser.userId as string,
+            currentUserUsername: updatedUser.username,
+            currentUserLevel: updatedUser.userLevel,
+            currentUserGameStatus: updatedUser.gameStatus,
+            currentUserIsGameOver: updatedUser.isGameOver,
+            currentUserScore: updatedUser.score,
+            currentUserTimeTaken: updatedUser.timeTaken,
+          },
+        });
       } else {
         // Final level completed
         const newUserState = {
@@ -88,6 +102,20 @@ export default function MultiplayerGameMain() {
           timeTaken: user.timeTaken + timeTakenInCurrentLevel,
         };
         updateUserState(newUserState);
+        const updatedUser = useGameStore.getState().user;
+        sendToDevvit({
+          type: 'OPPONENT_GAME_UPDATES_REQUEST',
+          payload: {
+            matchId: updatedUser.matchId as string,
+            currentUserId: updatedUser.userId as string,
+            currentUserUsername: updatedUser.username,
+            currentUserLevel: updatedUser.userLevel,
+            currentUserGameStatus: updatedUser.gameStatus,
+            currentUserIsGameOver: updatedUser.isGameOver,
+            currentUserScore: updatedUser.score,
+            currentUserTimeTaken: updatedUser.timeTaken,
+          },
+        });
       }
     }
   }, [isLevelOver]);
@@ -97,33 +125,33 @@ export default function MultiplayerGameMain() {
   }
 
   if (user.isGameOver) {
-    return null;
-    // return (
-    // <div className="flex h-full items-center justify-center">
-    //   <Card className="bg-[#fc6] text-black">
-    //     <CardHeader>
-    //       <CardTitle>Game Over</CardTitle>
-    //     </CardHeader>
-    //     <CardContent>
-    //       <p>Final Score: {user.score}</p>
-    //       <p>Game Status: {user.gameStatus}</p>
-    //       <p>Time Taken: {user.timeTaken} seconds</p>
-    //     </CardContent>
-    //     <CardFooter className="flex w-[350px] items-center justify-center gap-4 border-none p-4 shadow-none">
-    //       <Button
-    //         className="bg-black text-[#fc6] hover:bg-black hover:text-[#fc6]"
-    //         onClick={() => {
-    //           reset();
-    //           setPage('home');
-    //         }}
-    //       >
-    //         <MoveLeft />
-    //         Return to Main Menu
-    //       </Button>
-    //     </CardFooter>
-    //   </Card>
-    // </div>
-    // );
+    // return null;
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Card className="bg-[#fc6] text-black">
+          <CardHeader>
+            <CardTitle>Game Over</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Final Score: {user.score}</p>
+            <p>Game Status: {user.gameStatus}</p>
+            <p>Time Taken: {user.timeTaken} seconds</p>
+          </CardContent>
+          <CardFooter className="flex w-[350px] items-center justify-center gap-4 border-none p-4 shadow-none">
+            <Button
+              className="bg-black text-[#fc6] hover:bg-black hover:text-[#fc6]"
+              onClick={() => {
+                reset();
+                setPage('home');
+              }}
+            >
+              <MoveLeft />
+              Return to Main Menu
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
   }
 
   return (

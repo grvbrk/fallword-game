@@ -1,28 +1,34 @@
 import {create} from "zustand"
 import { QuestionType } from "./questions";
 
-type MultiplayerQuestion = QuestionType & {
+export type MultiplayerQuestion = QuestionType & {
   timeInSeconds: number
 }
 
-type UserState = {
+export type UserState = {
+  userId: string | undefined;
   username : string;
   userQuestions: MultiplayerQuestion[];
   userLevel: number;
-  gameStatus: 'waiting' | 'in-progress' | 'won' | 'lost';
+  gameStatus: 'waiting' | 'in-progress' | 'finished'
   isGameOver: boolean
   score: number
   timeTaken: number
+  matchId: string | undefined
 }
 
-type OpponentState = {
+export type OpponentState = {
   opponentUsername: string;
-  opponentLives: number;
   opponentLevel: number;
-  opponentGameStatus: 'waiting' | 'in-progress' | 'won' | 'lost';
+  opponentGameStatus: 'waiting' | 'in-progress' | 'finished';
+  opponentIsGameOver: boolean
+  opponentScore: number
+  opponentTimeTaken: number
+  opponentId: string | undefined
+  matchId: string | undefined
 }
 
-type multiplayerGameState = {
+export type multiplayerGameState = {
   user: UserState;
   opponent: OpponentState,
 }
@@ -35,20 +41,25 @@ updateUserState: (data: Partial<UserState>) => void;
 
 const initialState: multiplayerGameState = {
   user: {
+    userId: undefined,
     username: "",
     userQuestions: [],
     userLevel: 1,
     gameStatus: 'waiting',
     isGameOver: false,
     score: 0,
-    timeTaken: 0
-
+    timeTaken: 0,
+    matchId: undefined
   },
   opponent: {
     opponentUsername: "",
-    opponentLives: 5,
     opponentLevel: 1,
     opponentGameStatus: 'waiting',
+    opponentIsGameOver: false,
+    opponentScore: 0,
+    opponentTimeTaken: 0,
+    opponentId: undefined,
+    matchId: undefined
   },
 }
 

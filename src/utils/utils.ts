@@ -8,3 +8,7 @@ export const sendMessageToWebview = (
 ) => {
   context.ui.webView.postMessage(WEBVIEW_ID, message);
 };
+
+export async function wait(ms : number) {
+  return await new Promise((resolve) => setTimeout(resolve, ms*1000));
+}

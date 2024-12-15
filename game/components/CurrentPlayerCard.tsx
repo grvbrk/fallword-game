@@ -5,7 +5,6 @@ import { useGameSettings } from '../hooks/useGameConfig';
 
 export default function CurrentPlayerCard({ currentUser }: { currentUser: UserRecord }) {
   const { gameSettings } = useGameSettings();
-  console.log(currentUser);
 
   return (
     <Card className="relative mb-8 flex w-[500px] border-none shadow-none">

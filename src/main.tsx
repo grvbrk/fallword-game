@@ -1,11 +1,10 @@
-import { Devvit, useAsync, useChannel, User, useState } from '@devvit/public-api';
-import { sendMessageToWebview } from './utils/utils.js';
+import { Devvit, useAsync, useChannel, useState } from '@devvit/public-api';
+import { sendMessageToWebview, wait } from './utils/utils.js';
 import {
   ConnStatus,
   MatchmakingMessage,
   RealtimeUserMessage,
   REDIS_KEYS,
-  ResponseBodyType,
   UserRecord,
   UserStats,
   WebviewToBlockMessage,
@@ -17,7 +16,7 @@ import { getLeaderboardsData } from './core/leaderboard.js';
 Devvit.addSettings([
   {
     name: 'matchmaking_url',
-    label: 'Matchmaking url',
+    label: 'matchmaking url secret ',
     type: 'string',
     isSecret: true,
     scope: 'app',
@@ -58,13 +57,14 @@ Devvit.addMenuItem({
 });
 
 Devvit.addCustomPostType({
-  name: 'Experience Post',
+  name: 'FallWord Post',
   height: 'tall',
   render: (context) => {
     const currentSessionId = generateId();
     const redis = context.redis;
     const [launched, setLaunched] = useState(false);
     const [userList, setUserList] = useState<Record<string, UserRecord>>({});
+    const [currentMultiplayerGameId, setCurrentMultiplayerGameId] = useState<string | null>(null);
     const { data: currentUser } = useAsync<UserRecord | null>(async () => {
       const user = await context.reddit.getCurrentUser();
       if (!user) return null;
@@ -117,36 +117,34 @@ Devvit.addCustomPostType({
 
     const matchmakingChannel = useChannel<MatchmakingMessage>({
       name: 'matchmaking',
-      onMessage: (message) => {
+      onMessage: ({ type, data }) => {
         if (!currentUser) return;
 
-        switch (message.type) {
-          case 'MATCH_RESOLVE':
-            // Check if this match involves the current user
+        switch (type) {
+          case 'GAME_UPDATES':
             if (
-              message.payload.requesterUserId === currentUser.userId ||
-              message.payload.matchedOpponentId === currentUser.userId
+              !currentUser ||
+              data.sessionId === currentSessionId ||
+              data.currentUserUsername === currentUser.name ||
+              !currentMultiplayerGameId ||
+              currentMultiplayerGameId !== data.matchId
             ) {
-              // Determine the opponent based on current user
-              const opponentId =
-                message.payload.requesterUserId === currentUser.userId
-                  ? message.payload.matchedOpponentId
-                  : message.payload.requesterUserId;
-
-              const opponentUsername =
-                message.payload.requesterUserId === currentUser.userId
-                  ? message.payload.matchedOpponentUsername
-                  : message.payload.requesterUsername;
-
-              sendMessageToWebview(context, {
-                type: 'FIND_OPPONENT_RESPONSE',
-                payload: {
-                  foundOpponent: true,
-                  opponentId: opponentId,
-                  opponentUsername: opponentUsername,
-                },
-              });
+              return;
             }
+
+            sendMessageToWebview(context, {
+              type: 'OPPONENT_GAME_UPDATES_RESPONSE',
+              payload: {
+                matchId: data.matchId,
+                opponentUsername: data.currentUserUsername,
+                opponentLevel: data.currentUserLevel,
+                opponentGameStatus: data.currentUserGameStatus,
+                opponentIsGameOver: data.currentUserIsGameOver,
+                opponentScore: data.currentUserScore,
+                opponentTimeTaken: data.currentUserTimeTaken,
+              },
+            });
+
             break;
         }
       },
@@ -280,51 +278,72 @@ Devvit.addCustomPostType({
                 case 'FIND_OPPONENT_REQUEST':
                   if (!currentUser) return;
 
-                  // TODO: Custom response to design webview ui.
+                  // Custom response to test and design webview ui.
+                  // To be used only for testing multiplayer
+                  //aggressive
+                  setCurrentMultiplayerGameId('123');
+                  if (currentUser.userId === 't2_eh5q9bbq') {
+                    // await wait(2);
+                    sendMessageToWebview(context, {
+                      type: 'FIND_OPPONENT_RESPONSE',
+                      payload: {
+                        matchId: '123',
+                        foundOpponent: true,
+                        opponentId: 't2_6fgnqav8',
+                        opponentUsername: 'badsinn',
+                      },
+                    });
+                  }
+
+                  // badsinn
+                  if (currentUser.userId === 't2_6fgnqav8') {
+                    // await wait(3);
+                    sendMessageToWebview(context, {
+                      type: 'FIND_OPPONENT_RESPONSE',
+                      payload: {
+                        matchId: '123',
+                        foundOpponent: true,
+                        opponentId: 't2_eh5q9bbq',
+                        opponentUsername: 'aggressive',
+                      },
+                    });
+                  }
+
+                  // const matchmaking_url = await context.settings.get('matchmaking_url');
+                  // const response = await fetch(matchmaking_url as string, {
+                  //   method: 'POST',
+                  //   body: JSON.stringify({
+                  //     userId: currentUser.userId,
+                  //   }),
+                  // });
+
+                  // if (response.status !== 200) {
+                  //   sendMessageToWebview(context, {
+                  //     type: 'FIND_OPPONENT_RESPONSE',
+                  //     payload: {
+                  //       foundOpponent: false,
+                  //       matchId: undefined,
+                  //       opponentId: undefined,
+                  //       opponentUsername: undefined,
+                  //     },
+                  //   });
+
+                  //   break;
+                  // }
+
+                  // const resData = (await response.json()) as ResponseBodyType;
                   // sendMessageToWebview(context, {
                   //   type: 'FIND_OPPONENT_RESPONSE',
                   //   payload: {
                   //     foundOpponent: true,
-                  //     opponentId: '123',
-                  //     opponentUsername: 'random',
+                  //     matchId: resData.matchId,
+                  //     opponentId: resData.opponentId,
+                  //     opponentUsername: undefined,
                   //   },
                   // });
 
-                  const matchmaking_url = await context.settings.get('matchmaking_api_key');
-                  console.log(matchmaking_url);
-                  const response = await fetch('matchmaking_url', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                      userId: currentUser.userId,
-                    }),
-                  });
-
-                  if (response.status !== 200) {
-                    sendMessageToWebview(context, {
-                      type: 'FIND_OPPONENT_RESPONSE',
-                      payload: {
-                        foundOpponent: false,
-                        matchId: undefined,
-                        opponentId: undefined,
-                        opponentUsername: undefined,
-                      },
-                    });
-
-                    break;
-                  }
-
-                  const resData = (await response.json()) as ResponseBodyType;
-                  sendMessageToWebview(context, {
-                    type: 'FIND_OPPONENT_RESPONSE',
-                    payload: {
-                      foundOpponent: true,
-                      matchId: resData.matchId,
-                      opponentId: resData.opponentId,
-                      opponentUsername: undefined,
-                    },
-                  });
-
                   break;
+
                 case 'UPDATE_USER_STATS':
                   if (!currentUser) return;
                   const { singleplayer, win, lose } = data.payload;
@@ -382,6 +401,35 @@ Devvit.addCustomPostType({
                     payload: await getLeaderboardsData(redis),
                   });
                   break;
+
+                case 'OPPONENT_GAME_UPDATES_REQUEST':
+                  if (!currentUser) return;
+                  const {
+                    matchId,
+                    currentUserId,
+                    currentUserUsername,
+                    currentUserLevel,
+                    currentUserGameStatus,
+                    currentUserIsGameOver,
+                    currentUserScore,
+                    currentUserTimeTaken,
+                  } = data.payload;
+
+                  await matchmakingChannel.send({
+                    type: 'GAME_UPDATES',
+                    data: {
+                      sessionId: currentSessionId,
+                      matchId,
+                      currentUserId,
+                      currentUserUsername,
+                      currentUserLevel,
+                      currentUserGameStatus,
+                      currentUserIsGameOver,
+                      currentUserScore,
+                      currentUserTimeTaken,
+                    },
+                  });
+
                 default:
                   console.error('Unknown message type', data);
                   break;

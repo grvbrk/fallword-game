@@ -45,7 +45,7 @@ export const HomePage = ({
         <ActiveUsers userCount={usersCount} />
         <Changelog />
         <SettingsButton />
-        <LeaderBoard leaderboard={Leaderboard} />
+        <LeaderBoard leaderboard={Leaderboard} currentUser={currentUser} />
       </div>
 
       <div className="z-50 mb-5 flex select-none flex-col items-center font-game3">

@@ -24,49 +24,56 @@ export const MultiPlayerPage = ({ currentUser }: { currentUser: UserRecord }) =>
   }, []);
 
   // Uncomment this when using npm run dev
-  // useEffect(() => {
-  //   if (opponentData && opponentData.foundOpponent) {
-  //     updateUserState({
-  //       username: currentUser.name,
-  //       userQuestions: generateMultiplayerQuestions(),
-  //       userLevel: 1,
-  //       gameStatus: 'waiting',
-  //       isGameOver: false,
-  //       score: 0,
-  //       timeTaken: 0,
-  //     });
-  //     updateOpponentState({
-  //       opponentUsername: opponentData?.opponentId,
-  //       opponentLives: 5,
-  //       opponentLevel: 1,
-  //       opponentGameStatus: 'waiting',
-  //     });
-  //     setOpponentFound(true);
-  //   } else {
-  //     setOpponentFound(false);
-  //   }
-  // }, [opponentData]);
+  useEffect(() => {
+    if (opponentData && opponentData.foundOpponent) {
+      updateUserState({
+        userId: currentUser.userId,
+        username: currentUser.name,
+        userQuestions: generateMultiplayerQuestions(),
+        userLevel: 1,
+        gameStatus: 'waiting',
+        isGameOver: false,
+        score: 0,
+        timeTaken: 0,
+        matchId: opponentData.matchId,
+      });
+      updateOpponentState({
+        opponentUsername: opponentData.opponentUsername,
+        opponentLevel: 1,
+        opponentGameStatus: 'waiting',
+        opponentIsGameOver: false,
+        opponentScore: 0,
+        opponentTimeTaken: 0,
+        opponentId: opponentData.opponentId,
+        matchId: opponentData.matchId,
+      });
+      setOpponentFound(true);
+    } else {
+      setOpponentFound(false);
+    }
+  }, [opponentData]);
 
   // Uncomment this when using npm run vite
 
-  useEffect(() => {
-    updateUserState({
-      username: currentUser.name,
-      userQuestions: generateMultiplayerQuestions(),
-      userLevel: 1,
-      gameStatus: 'waiting',
-      isGameOver: false,
-      score: 0,
-      timeTaken: 0,
-    });
-    updateOpponentState({
-      opponentUsername: opponentData?.opponentUsername,
-      opponentLives: 5,
-      opponentLevel: 1,
-      opponentGameStatus: 'waiting',
-    });
-    setOpponentFound(true);
-  }, []);
+  // useEffect(() => {
+  //   updateUserState({
+  //     username: currentUser.name,
+  //     userQuestions: generateMultiplayerQuestions(),
+  //     userLevel: 1,
+  //     gameStatus: 'waiting',
+  //     isGameOver: false,
+  //     score: 0,
+  //     timeTaken: 0,
+  //   });
+  //   updateOpponentState({
+  //     opponentUsername: opponentData?.opponentUsername,
+  //     opponentLevel: 1,
+  //     opponentGameStatus: 'waiting',
+  //     opponentScore: 0,
+  //     opponentTimeTaken: 0,
+  //   });
+  //   setOpponentFound(true);
+  // }, []);
 
   return (
     <div
@@ -83,7 +90,7 @@ export const MultiPlayerPage = ({ currentUser }: { currentUser: UserRecord }) =>
       />
       <Snowfall />
       {opponentFound ? (
-        <div className="flex items-center justify-center gap-10">
+        <div className="flex items-center justify-center gap-2">
           <UserUpdatesTracker />
           <div className="z-50 flex h-[550px] flex-col items-center pt-16">
             <MultiplayerGameMain />

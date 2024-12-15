@@ -8,25 +8,13 @@ import { EthernetPort, Tally5, Hourglass, Gauge } from 'lucide-react';
 export default function OpponentUpdatesTracker() {
   const { opponent, updateOpponentState } = useGameStore();
 
-  // const opponentLifeLostUpdate = useDevvitListener('OPPONENT_LIFE_LOST');
-  const opponentGameOverUpdate = useDevvitListener('GAME_OVER');
-
-  // useEffect(() => {
-  //   if (opponentLifeLostUpdate) {
-  //     updateOpponentState({
-  //       opponentLives: opponentLifeLostUpdate.livesRemaining,
-  //       opponentGameStatus: 'in-progress',
-  //     });
-  //   }
-  // }, [opponentLifeLostUpdate]);
+  const opponentGameUpdate = useDevvitListener('OPPONENT_GAME_UPDATES_RESPONSE');
 
   useEffect(() => {
-    if (opponentGameOverUpdate) {
-      updateOpponentState({
-        opponentGameStatus: opponentGameOverUpdate.status,
-      });
+    if (opponentGameUpdate) {
+      updateOpponentState(opponentGameUpdate);
     }
-  }, [opponentGameOverUpdate]);
+  }, [opponentGameUpdate]);
 
   return (
     <motion.div
