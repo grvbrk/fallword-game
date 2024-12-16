@@ -2,16 +2,20 @@ import { motion } from 'framer-motion';
 import useGameStore from '../stores';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { EthernetPort, Gauge, Hourglass, Tally5 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-export default function UserUpatesTracker() {
+export default function UserUpatesTracker({
+  userGameResult,
+  setUserGameResult,
+}: {
+  userGameResult: 'won' | 'lost' | 'tie' | null;
+  setUserGameResult: React.Dispatch<React.SetStateAction<'won' | 'lost' | 'tie' | null>>;
+}) {
   const { gameStatus, score, timeTaken, userLevel } = useGameStore((state) => state.user);
 
   const { opponentGameStatus, opponentScore, opponentTimeTaken } = useGameStore(
     (state) => state.opponent
   );
-
-  const [userGameResult, setUserGameResult] = useState<'won' | 'lost' | 'tie' | null>(null);
 
   useEffect(() => {
     if (opponentGameStatus === 'finished' && gameStatus === 'finished') {

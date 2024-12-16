@@ -290,7 +290,7 @@ Devvit.addCustomPostType({
                   //aggressive
                   setCurrentMultiplayerGameId('123');
                   if (currentUser.userId === 't2_eh5q9bbq') {
-                    await wait(2);
+                    // await wait(2);
                     sendMessageToWebview(context, {
                       type: 'FIND_OPPONENT_RESPONSE',
                       payload: {
@@ -304,7 +304,7 @@ Devvit.addCustomPostType({
 
                   // badsinn
                   if (currentUser.userId === 't2_6fgnqav8') {
-                    await wait(3);
+                    // await wait(3);
                     sendMessageToWebview(context, {
                       type: 'FIND_OPPONENT_RESPONSE',
                       payload: {
@@ -441,6 +441,81 @@ Devvit.addCustomPostType({
                   });
                   break;
 
+                case 'GAME_OVER_MULTIPLAYER':
+                  if (!currentUser) return;
+                  const {
+                    matchId: gameId,
+                    winningUserId,
+                    winningUsername,
+                    loserUserId,
+                    loserUsername,
+                  } = data.payload;
+
+                  const [
+                    winningUserStatsData,
+                    losingUserStatsData,
+                    winningUserInLeaderboard,
+                    loserUserInLeaderboard,
+                  ] = await Promise.all([
+                    await redis.hGet(REDIS_KEYS.USER_STATS, winningUserId),
+                    await redis.hGet(REDIS_KEYS.USER_STATS, loserUserId),
+                    await redis.zScore(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, winningUserId),
+                    await redis.zScore(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, loserUserId),
+                  ]);
+
+                  if (
+                    !winningUserStatsData ||
+                    !losingUserStatsData ||
+                    winningUserInLeaderboard === undefined ||
+                    loserUserInLeaderboard === undefined
+                  ) {
+                    return;
+                  }
+
+                  const winningUserStats = JSON.parse(winningUserStatsData) as UserStats;
+                  const losingUserStats = JSON.parse(losingUserStatsData) as UserStats;
+
+                  // winning user stats update
+                  winningUserStats.multiplayermatches = winningUserStats.multiplayermatches! + 1;
+                  winningUserStats.multiplayerwins = winningUserStats.multiplayerwins! + 1;
+                  await redis.zIncrBy(REDIS_KEYS.LEADERBOARD_MULTIPLAYER, winningUserId, -1);
+
+                  //losing user stats update
+                  losingUserStats.multiplayermatches = losingUserStats.multiplayermatches! + 1;
+                  losingUserStats.multiplayerlosses = losingUserStats.multiplayerlosses! + 1;
+
+                  const [winningUserRank, losingUserRank] = await Promise.all([
+                    redis.zRank(REDIS_KEYS.LEADERBOARD_MULTIPLAYER, winningUserId),
+                    redis.zRank(REDIS_KEYS.LEADERBOARD_MULTIPLAYER, loserUserId),
+                  ]);
+
+                  // winning user rank update
+                  winningUserStats.multiplayerrank = winningUserRank;
+                  // losing user rank update
+                  losingUserStats.multiplayerrank = losingUserRank;
+
+                  await Promise.all([
+                    await redis.hSet(REDIS_KEYS.USER_STATS, {
+                      [winningUserId]: JSON.stringify(winningUserStats),
+                    }),
+                    await redis.hSet(REDIS_KEYS.USER_STATS, {
+                      [loserUserId]: JSON.stringify(losingUserStats),
+                    }),
+                  ]);
+
+                  sendMessageToWebview(context, {
+                    type: 'USER_STATS_UPDATED',
+                    payload: {
+                      userId: winningUserId,
+                      stats: winningUserStats,
+                    },
+                  });
+                  sendMessageToWebview(context, {
+                    type: 'LEADERBOARD_UPDATE',
+                    payload: await getLeaderboardsData(redis),
+                  });
+
+                  break;
                 default:
                   console.error('Unknown message type', data);
                   break;

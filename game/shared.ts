@@ -98,6 +98,16 @@ export type WebviewToBlockMessage =
         currentUserScore: number;
         currentUserTimeTaken: number;
       };
+    }
+  | {
+      type: 'GAME_OVER_MULTIPLAYER';
+      payload: {
+        matchId: string;
+        winningUserId: string;
+        winningUsername: string;
+        loserUserId: string;
+        loserUsername: string;
+      };
     };
 
 export type BlocksToWebviewMessage =

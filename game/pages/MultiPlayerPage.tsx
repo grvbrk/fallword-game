@@ -16,6 +16,10 @@ import { motion } from 'framer-motion';
 
 export const MultiPlayerPage = ({ currentUser }: { currentUser: UserRecord }) => {
   const [opponentFound, setOpponentFound] = useState<boolean>(false);
+  const [userGameResult, setUserGameResult] = useState<'won' | 'lost' | 'tie' | null>(null);
+
+  const [opponentGameResult, setOpponentGameResult] = useState<'won' | 'lost' | 'tie' | null>(null);
+
   const opponentData = useDevvitListener('FIND_OPPONENT_RESPONSE');
   const updateUserState = useGameStore((state) => state.updateUserState);
   const updateOpponentState = useGameStore((state) => state.updateOpponentState);
@@ -27,6 +31,22 @@ export const MultiPlayerPage = ({ currentUser }: { currentUser: UserRecord }) =>
   useEffect(() => {
     sendToDevvit({ type: 'FIND_OPPONENT_REQUEST' });
   }, []);
+
+  useEffect(() => {
+    if (userGameResult === 'won' && opponentGameResult === 'lost') {
+      console.log('ran');
+      sendToDevvit({
+        type: 'GAME_OVER_MULTIPLAYER',
+        payload: {
+          matchId: user.matchId!,
+          winningUserId: user.userId!,
+          winningUsername: user.username,
+          loserUserId: opponent.opponentId!,
+          loserUsername: opponent.opponentUsername,
+        },
+      });
+    }
+  }, [userGameResult, opponentGameResult]);
 
   // Uncomment this when using npm run dev
   useEffect(() => {
@@ -98,11 +118,17 @@ export const MultiPlayerPage = ({ currentUser }: { currentUser: UserRecord }) =>
       {opponentFound ? (
         <div className="flex flex-col">
           <div className="flex">
-            <UserUpdatesTracker />
+            <UserUpdatesTracker
+              userGameResult={userGameResult}
+              setUserGameResult={setUserGameResult}
+            />
             <div className="z-50 flex flex-col items-center pt-16">
               <MultiplayerGameMain />
             </div>
-            <OpponentUpdatesTracker />
+            <OpponentUpdatesTracker
+              opponentGameResult={opponentGameResult}
+              setOpponentGameResult={setOpponentGameResult}
+            />
           </div>
           {user.gameStatus === 'finished' && opponent.opponentGameStatus === 'finished' ? (
             <motion.div

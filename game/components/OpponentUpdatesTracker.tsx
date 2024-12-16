@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDevvitListener } from '../hooks/useDevvitListener';
 import useGameStore from '../stores';
 import { Card, CardHeader, CardContent } from './ui/card';
 import { motion } from 'framer-motion';
 import { EthernetPort, Tally5, Hourglass, Gauge } from 'lucide-react';
 
-export default function OpponentUpdatesTracker() {
+export default function OpponentUpdatesTracker({
+  opponentGameResult,
+  setOpponentGameResult,
+}: {
+  opponentGameResult: 'won' | 'lost' | 'tie' | null;
+  setOpponentGameResult: React.Dispatch<React.SetStateAction<'won' | 'lost' | 'tie' | null>>;
+}) {
   const { user, opponent, updateOpponentState } = useGameStore();
-  const [opponentGameResult, setOpponentGameResult] = useState<'won' | 'lost' | 'tie' | null>(null);
 
   const opponentGameUpdate = useDevvitListener('OPPONENT_GAME_UPDATES_RESPONSE');
 
