@@ -13,13 +13,13 @@ const getPage = (
   {
     usersCount,
     currentUser,
-    Leaderboard,
-  }: { usersCount: number; currentUser: UserRecord; Leaderboard: LeaderboardDataType }
+    leaderboard,
+  }: { usersCount: number; currentUser: UserRecord; leaderboard: LeaderboardDataType }
 ) => {
   switch (page) {
     case 'home':
       return (
-        <HomePage usersCount={usersCount} currentUser={currentUser} Leaderboard={Leaderboard} />
+        <HomePage usersCount={usersCount} currentUser={currentUser} leaderboard={leaderboard} />
       );
     case 'singleplayerGame':
       return <SinglePlayerPage currentUser={currentUser} />;
@@ -33,7 +33,7 @@ const getPage = (
 export const App = () => {
   const [usersCount, setUsersCount] = useState<number>(0);
   const [currentUser, setCurrentUser] = useState<UserRecord>({} as UserRecord);
-  const [Leaderboard, setLeaderboard] = useState<LeaderboardDataType>({
+  const [leaderboard, setLeaderboard] = useState<LeaderboardDataType>({
     singleplayer: [],
     multiplayer: [],
   });
@@ -63,7 +63,7 @@ export const App = () => {
     }
 
     if (userStatsData) {
-      setCurrentUser((data) => ({ ...data, stats: userStatsData.stats }));
+      setCurrentUser((data) => ({ ...data, ...userStatsData.stats }));
     }
 
     if (leaderboardData) {
@@ -71,5 +71,5 @@ export const App = () => {
     }
   }, [initData, userJoined, userDisconn, userStatsData, leaderboardData]);
 
-  return <div className="h-full">{getPage(page, { usersCount, currentUser, Leaderboard })}</div>;
+  return <div className="h-full">{getPage(page, { usersCount, currentUser, leaderboard })}</div>;
 };

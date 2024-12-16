@@ -2,11 +2,30 @@ import { motion } from 'framer-motion';
 import useGameStore from '../stores';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { EthernetPort, Gauge, Hourglass, Tally5 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function UserUpatesTracker() {
-  const { username, gameStatus, isGameOver, score, timeTaken, userLevel } = useGameStore(
-    (state) => state.user
+  const { gameStatus, score, timeTaken, userLevel } = useGameStore((state) => state.user);
+
+  const { opponentGameStatus, opponentScore, opponentTimeTaken } = useGameStore(
+    (state) => state.opponent
   );
+
+  const [userGameResult, setUserGameResult] = useState<'won' | 'lost' | 'tie' | null>(null);
+
+  useEffect(() => {
+    if (opponentGameStatus === 'finished' && gameStatus === 'finished') {
+      if (score > opponentScore) {
+        setUserGameResult('won');
+      } else if (timeTaken < opponentTimeTaken) {
+        setUserGameResult('won');
+      } else if (score === opponentScore && timeTaken === opponentTimeTaken) {
+        setUserGameResult('tie');
+      } else {
+        setUserGameResult('lost');
+      }
+    }
+  }, [opponentGameStatus, gameStatus]);
 
   return (
     <motion.div
@@ -14,12 +33,8 @@ export default function UserUpatesTracker() {
       initial={{ opacity: 0, y: -25 }}
       animate={{ opacity: 1, y: 0 }}
     >
+      {userGameResult != null && userGameResult}
       <Card className="mx-5 border-none bg-[#fc6] shadow-[1px_1px_rgba(0,0,0),2px_2px_rgba(0,0,0),3px_3px_rgba(0,0,0),4px_4px_rgba(0,0,0),5px_5px_0px_0px_rgba(0,0,0)]">
-        {/* <CardHeader className="max-w-40 text-black">
-          <CardTitle className="truncate text-xl font-medium">
-            {username ? 'u/' + username : 'u/grvbrkkkkkkkkkkkkkkkkkk'}
-          </CardTitle>
-        </CardHeader> */}
         <CardContent className="flex w-44 flex-col px-4 py-2 text-black">
           <div className="flex items-center justify-between text-center">
             <div className="flex w-full items-center justify-start gap-1 font-bold">
@@ -49,8 +64,6 @@ export default function UserUpatesTracker() {
             </div>
             <p className="w-full text-right text-sm">{userLevel}</p>
           </div>
-
-          {/* <p>{isGameOver ? 'Game Over' : 'Game In Progress'}</p> */}
         </CardContent>
       </Card>
       <Card className="relative flex w-[150px] flex-col overflow-hidden border-none shadow-none">

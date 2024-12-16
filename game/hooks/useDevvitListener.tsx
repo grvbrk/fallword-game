@@ -24,7 +24,6 @@ import { DevvitMessage, BlocksToWebviewMessage } from '../shared';
  *  useEffect(() => {
  *    if (data) {
  *      // great place to set loading to false!
- *      console.log(data.error, data.similarity);
  *    }
  *   }, [data]);
  *

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDevvitListener } from '../hooks/useDevvitListener';
 import useGameStore from '../stores';
 import { Card, CardHeader, CardContent } from './ui/card';
@@ -6,15 +6,32 @@ import { motion } from 'framer-motion';
 import { EthernetPort, Tally5, Hourglass, Gauge } from 'lucide-react';
 
 export default function OpponentUpdatesTracker() {
-  const { opponent, updateOpponentState } = useGameStore();
+  const { user, opponent, updateOpponentState } = useGameStore();
+  const [opponentGameResult, setOpponentGameResult] = useState<'won' | 'lost' | 'tie' | null>(null);
 
   const opponentGameUpdate = useDevvitListener('OPPONENT_GAME_UPDATES_RESPONSE');
 
   useEffect(() => {
     if (opponentGameUpdate) {
+      if (opponentGameUpdate.opponentGameStatus === 'finished' && user.gameStatus === 'finished') {
+        if (user.score < opponentGameUpdate.opponentScore) {
+          setOpponentGameResult('won');
+        } else if (user.timeTaken > opponentGameUpdate.opponentTimeTaken) {
+          setOpponentGameResult('won');
+        } else if (
+          user.score === opponentGameUpdate.opponentScore &&
+          user.timeTaken === opponentGameUpdate.opponentTimeTaken
+        ) {
+          setOpponentGameResult('tie');
+        } else {
+          setOpponentGameResult('lost');
+        }
+      }
+      // console.log('game updates recieved from', opponentGameUpdate.opponentUsername);
+      // console.log(opponentGameUpdate);
       updateOpponentState(opponentGameUpdate);
     }
-  }, [opponentGameUpdate]);
+  }, [opponentGameUpdate, user.gameStatus]);
 
   return (
     <motion.div
@@ -22,12 +39,8 @@ export default function OpponentUpdatesTracker() {
       initial={{ opacity: 0, y: -25 }}
       animate={{ opacity: 1, y: 0 }}
     >
+      {opponentGameResult != null && opponentGameResult}
       <Card className="mx-5 border-none bg-[#fc6] shadow-[1px_1px_rgba(0,0,0),2px_2px_rgba(0,0,0),3px_3px_rgba(0,0,0),4px_4px_rgba(0,0,0),5px_5px_0px_0px_rgba(0,0,0)]">
-        {/* <CardHeader className="max-w-40 text-black">
-          <CardTitle className="truncate text-xl font-medium">
-            {username ? 'u/' + username : 'u/grvbrkkkkkkkkkkkkkkkkkk'}
-          </CardTitle>
-        </CardHeader> */}
         <CardContent className="flex w-44 flex-col px-4 py-2 text-black">
           <div className="flex items-center justify-between text-center">
             <div className="flex w-full items-center justify-start gap-1 font-bold">
@@ -57,8 +70,6 @@ export default function OpponentUpdatesTracker() {
             </div>
             <p className="w-full text-right text-sm">{opponent.opponentLevel}</p>
           </div>
-
-          {/* <p>{isGameOver ? 'Game Over' : 'Game In Progress'}</p> */}
         </CardContent>
       </Card>
       <Card className="relative flex w-[150px] flex-col overflow-hidden border-none shadow-none">

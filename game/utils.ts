@@ -1,4 +1,4 @@
-import { WebviewToBlockMessage } from './shared';
+import { UserRecord, WebviewToBlockMessage } from './shared';
 import { ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { questionsList } from './questions';
@@ -33,31 +33,48 @@ export function generateMultiplayerQuestions() {
     throw new Error('Not enough questions of each difficulty level');
   }
 
-  function shuffleArray<T>(array: T[]): T[]  {
+  function shuffleArray<T>(array: T[]): T[] {
     return array
       .map((value) => ({ value, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
       .map(({ value }) => value);
-  };
+  }
 
-  const shuffledEasy = shuffleArray(easyQuestions).map((q) =>{
+  const shuffledEasy = shuffleArray(easyQuestions).map((q) => {
     return {
       ...q,
-      timeInSeconds: 60
-    }
+      timeInSeconds: 60,
+    };
   });
-  const shuffledMedium = shuffleArray(mediumQuestions).map((q) =>{
+  const shuffledMedium = shuffleArray(mediumQuestions).map((q) => {
     return {
       ...q,
-      timeInSeconds: 45
-    }
+      timeInSeconds: 45,
+    };
   });
-  const shuffledHard = shuffleArray(hardQuestions).map((q) =>{
+  const shuffledHard = shuffleArray(hardQuestions).map((q) => {
     return {
       ...q,
-      timeInSeconds: 30
-    }
+      timeInSeconds: 30,
+    };
   });
 
   return [shuffledEasy[0], shuffledEasy[1], shuffledMedium[0], shuffledMedium[1], shuffledHard[0]];
+}
+
+export function calculateWinPercentages(currentUser: UserRecord) {
+  const roundToTwoDecimals = (num: number) => Math.round(num * 100) / 100;
+
+  const totalMatches =
+    (currentUser.singleplayermatches ?? 0) + (currentUser.multiplayermatches ?? 0);
+  const totalWins = (currentUser.singleplayerwins ?? 0) + (currentUser.multiplayerwins ?? 0);
+
+  let overallWinPercentage: number;
+  if (totalMatches > 0) {
+    overallWinPercentage = roundToTwoDecimals((totalWins / totalMatches) * 100);
+  } else {
+    overallWinPercentage = 0;
+  }
+
+  return overallWinPercentage;
 }

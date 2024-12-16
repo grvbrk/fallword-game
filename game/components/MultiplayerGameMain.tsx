@@ -1,18 +1,16 @@
-import { Heart, MoveLeft } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
 import { isVowel, sendToDevvit } from '../utils';
 import AlphabetList from './AlphabetList';
 import { AlphabetSlot } from './AlphabetSlot';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from './ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import useGameStore from '../stores';
 import Confetti from 'react-confetti';
 import Timer from './Timer';
-import { Button } from './ui/button';
-import { useSetPage } from '../hooks/usePage';
 
 export default function MultiplayerGameMain() {
-  const { user, updateUserState, reset } = useGameStore();
-  const setPage = useSetPage();
+  const { user, updateUserState } = useGameStore();
+  // const setPage = useSetPage();
 
   const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
   const [lives, setLives] = useState<number>(5);
@@ -86,7 +84,7 @@ export default function MultiplayerGameMain() {
             currentUserUsername: updatedUser.username,
             currentUserLevel: updatedUser.userLevel,
             currentUserGameStatus: updatedUser.gameStatus,
-            currentUserIsGameOver: updatedUser.isGameOver,
+            currentUserGameResult: updatedUser.gameResult,
             currentUserScore: updatedUser.score,
             currentUserTimeTaken: updatedUser.timeTaken,
           },
@@ -98,7 +96,6 @@ export default function MultiplayerGameMain() {
           userLevel: currentLevel,
           score: user.score + (isLevelWon ? 1 : 0),
           gameStatus: (isLevelWon && 'finished') as 'waiting' | 'in-progress' | 'finished',
-          isGameOver: true,
           timeTaken: user.timeTaken + timeTakenInCurrentLevel,
         };
         updateUserState(newUserState);
@@ -111,7 +108,7 @@ export default function MultiplayerGameMain() {
             currentUserUsername: updatedUser.username,
             currentUserLevel: updatedUser.userLevel,
             currentUserGameStatus: updatedUser.gameStatus,
-            currentUserIsGameOver: updatedUser.isGameOver,
+            currentUserGameResult: updatedUser.gameResult,
             currentUserScore: updatedUser.score,
             currentUserTimeTaken: updatedUser.timeTaken,
           },
@@ -124,34 +121,34 @@ export default function MultiplayerGameMain() {
     setLives(0);
   }
 
-  if (user.isGameOver) {
-    // return null;
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Card className="bg-[#fc6] text-black">
-          <CardHeader>
-            <CardTitle>Game Over</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Final Score: {user.score}</p>
-            <p>Game Status: {user.gameStatus}</p>
-            <p>Time Taken: {user.timeTaken} seconds</p>
-          </CardContent>
-          <CardFooter className="flex w-[350px] items-center justify-center gap-4 border-none p-4 shadow-none">
-            <Button
-              className="bg-black text-[#fc6] hover:bg-black hover:text-[#fc6]"
-              onClick={() => {
-                reset();
-                setPage('home');
-              }}
-            >
-              <MoveLeft />
-              Return to Main Menu
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    );
+  if (user.gameStatus === 'finished') {
+    return null;
+    // return (
+    //   <div className="flex h-full items-center justify-center">
+    //     <Card className="bg-[#fc6] text-black">
+    //       <CardHeader>
+    //         <CardTitle>Game Over</CardTitle>
+    //       </CardHeader>
+    //       <CardContent>
+    //         <p>Final Score: {user.score}</p>
+    //         <p>Game Status: {user.gameStatus}</p>
+    //         <p>Time Taken: {user.timeTaken} seconds</p>
+    //       </CardContent>
+    //       <CardFooter className="flex w-[350px] items-center justify-center gap-4 border-none p-4 shadow-none">
+    //         <Button
+    //           className="bg-black text-[#fc6] hover:bg-black hover:text-[#fc6]"
+    //           onClick={() => {
+    //             reset();
+    //             setPage('home');
+    //           }}
+    //         >
+    //           <MoveLeft />
+    //           Return to Main Menu
+    //         </Button>
+    //       </CardFooter>
+    //     </Card>
+    //   </div>
+    // );
   }
 
   return (
@@ -210,7 +207,7 @@ export default function MultiplayerGameMain() {
       </Card>
       <Card className="w-[420px] border-none p-4 shadow-none">
         <AlphabetList
-          isGameOver={user.isGameOver}
+          isGameOver={(user.gameStatus as 'waiting' | 'in-progress' | 'finished') === 'finished'}
           setGuessedLetters={setGuessedLetters}
           guessedLetters={guessedLetters}
           answerLetters={answerLetters}

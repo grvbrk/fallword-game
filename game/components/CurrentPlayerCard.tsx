@@ -2,6 +2,7 @@ import { Award, ChartNoAxesCombined, Star, Swords } from 'lucide-react';
 import { UserRecord } from '../shared';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { useGameSettings } from '../hooks/useGameConfig';
+import { calculateWinPercentages } from '../utils';
 
 export default function CurrentPlayerCard({ currentUser }: { currentUser: UserRecord }) {
   const { gameSettings } = useGameSettings();
@@ -30,15 +31,8 @@ export default function CurrentPlayerCard({ currentUser }: { currentUser: UserRe
             <div className="flex items-center gap-1">
               <Star className="h-10 w-10" strokeWidth={1.5} />
               <div className="text-left">
-                <div className="text-xl font-bold">
-                  {Math.min(
-                    currentUser.multiplayerrank === undefined ? 0 : currentUser.multiplayerrank + 1,
-                    currentUser.singleplayerrank === undefined
-                      ? 0
-                      : currentUser.singleplayerrank + 1
-                  )}
-                </div>
-                <p className="text-xs text-black/80">Rank</p>
+                <div className="text-xl font-bold">{calculateWinPercentages(currentUser)}</div>
+                <p className="text-xs text-black/80">Win %</p>
               </div>
             </div>
             <div className="flex items-center gap-1">

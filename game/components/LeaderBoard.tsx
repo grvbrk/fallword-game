@@ -4,15 +4,10 @@ import { Card } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { ScrollArea } from './ui/scroll-area';
 import { Separator } from './ui/separator';
-import { LeaderboardDataType, UserRecord } from '../shared';
+import { LeaderboardDataType } from '../shared';
 
-export default function LeaderBoard({
-  leaderboard,
-  currentUser,
-}: {
-  leaderboard: LeaderboardDataType;
-  currentUser: UserRecord;
-}) {
+export default function LeaderBoard({ leaderboard }: { leaderboard: LeaderboardDataType }) {
+  console.log(leaderboard);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -42,8 +37,8 @@ export default function LeaderBoard({
                     key={idx}
                   >
                     <div className="w-full truncate">{idx + 1}</div>
-                    <div className="w-full truncate">{'u/' + user.member}</div>
-                    <div className="w-full truncate">{currentUser.singleplayermatches}</div>
+                    <div className="w-full truncate">{'u/' + user.username}</div>
+                    <div className="w-full truncate">{user.matches}</div>
                     <div className="w-full truncate">{user.score}</div>
                     <Separator className="my-2" />
                   </div>
@@ -66,8 +61,8 @@ export default function LeaderBoard({
                     key={idx}
                   >
                     <div className="w-full truncate">{idx + 1}</div>
-                    <div className="w-full truncate">{'u/' + user.member}</div>
-                    <div className="w-full truncate">{currentUser.multiplayermatches}</div>
+                    <div className="w-full truncate">{'u/' + user.username}</div>
+                    <div className="w-full truncate">{user.matches}</div>
                     <div className="w-full truncate">{user.score}</div>
                     <Separator className="my-2" />
                   </div>

@@ -16,11 +16,11 @@ import LeaderBoard from '../components/LeaderBoard';
 export const HomePage = ({
   usersCount,
   currentUser,
-  Leaderboard,
+  leaderboard,
 }: {
   usersCount: number;
   currentUser: UserRecord;
-  Leaderboard: LeaderboardDataType;
+  leaderboard: LeaderboardDataType;
 }) => {
   const setPage = useSetPage();
   const { gameSettings } = useGameSettings();
@@ -45,7 +45,7 @@ export const HomePage = ({
         <ActiveUsers userCount={usersCount} />
         <Changelog />
         <SettingsButton />
-        <LeaderBoard leaderboard={Leaderboard} currentUser={currentUser} />
+        <LeaderBoard leaderboard={leaderboard} />
       </div>
 
       <div className="z-50 mb-5 flex select-none flex-col items-center font-game3">
@@ -76,7 +76,7 @@ export const HomePage = ({
           }}
         >
           Start Game
-          <MoveRight size={20} />
+          <MoveRight size={20} className="mt-1" />
         </NeoButton>
       </div>
     </div>

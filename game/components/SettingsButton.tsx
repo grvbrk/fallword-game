@@ -51,7 +51,7 @@ export function SettingsButton() {
             <SettingsIcon className="h-6 w-6 cursor-pointer hover:text-[#fc6]" />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-80 bg-[#fc6] p-4 shadow-[1px_1px_rgba(0,0,0),2px_2px_rgba(0,0,0),3px_3px_rgba(0,0,0),4px_4px_rgba(0,0,0),5px_5px_0px_0px_rgba(0,0,0)]">
+        <PopoverContent className="mr-5 w-80 bg-[#fc6] p-4 shadow-[1px_1px_rgba(0,0,0),2px_2px_rgba(0,0,0),3px_3px_rgba(0,0,0),4px_4px_rgba(0,0,0),5px_5px_0px_0px_rgba(0,0,0)]">
           <NavigationButton
             options={['Easy', 'Medium', 'Hard']}
             currentIndex={difficultyIndex}

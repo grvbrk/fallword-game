@@ -1,13 +1,11 @@
 export type Page = 'home' | 'singleplayerGame' | 'multiplayerGame';
 
 export const REDIS_KEYS = {
-  // PENDING_REQUESTS: 'matchmaking:pending_requests2',
-  // ACTIVE_MATCHES: 'matchmaking:active_matches2',
-  // PENDING_REQUESTS_HASH: 'matchmaking:pending_requests_hash2',
-  USER_LIST: 'fallword:user_list',
-  USER_STATS: 'fallword:user_stats',
+  // TODO: Should we store user Stats in their keys in the userlist?
+  USER_LIST: 'fallword:user_list', // List of all users
+  USER_STATS: 'fallword:user_stats', // Stats of all users
   LEADERBOARD_SINGLEPLAYER: 'fallword:leaderboard_singleplayer',
-  LEADERBORD_MULTIPLAYER: 'fallword:leaderboard_multiplayer',
+  LEADERBOARD_MULTIPLAYER: 'fallword:leaderboard_multiplayer',
 };
 
 export const REDIS_TTL = {
@@ -37,8 +35,8 @@ export type UserData = {
 export type UserRecord = UserData & UserStats;
 
 export type LeaderboardDataType = {
-  singleplayer: { member: string; score: number }[];
-  multiplayer: { member: string; score: number }[];
+  singleplayer: { username: string; score: number; matches: number }[];
+  multiplayer: { username: string; score: number; matches: number }[];
 };
 
 export enum ConnStatus {
@@ -67,7 +65,7 @@ export type MatchmakingMessage = {
     currentUserUsername: string;
     currentUserLevel: number;
     currentUserGameStatus: 'waiting' | 'in-progress' | 'finished';
-    currentUserIsGameOver: boolean;
+    currentUserGameResult: 'won' | 'lost' | 'tie' | null;
     currentUserScore: number;
     currentUserTimeTaken: number;
   };
@@ -82,9 +80,8 @@ export type WebviewToBlockMessage =
       type: 'FIND_OPPONENT_REQUEST';
     }
   | {
-      type: 'UPDATE_USER_STATS';
+      type: 'UPDATE_USER_STATS_SINGLEPLAYER';
       payload: {
-        singleplayer: boolean;
         win: string;
         lose: string;
       };
@@ -97,7 +94,7 @@ export type WebviewToBlockMessage =
         currentUserUsername: string;
         currentUserLevel: number;
         currentUserGameStatus: 'waiting' | 'in-progress' | 'finished';
-        currentUserIsGameOver: boolean;
+        currentUserGameResult: 'won' | 'lost' | 'tie' | null;
         currentUserScore: number;
         currentUserTimeTaken: number;
       };
@@ -147,7 +144,7 @@ export type BlocksToWebviewMessage =
         opponentUsername: string;
         opponentLevel: number;
         opponentGameStatus: 'waiting' | 'in-progress' | 'finished';
-        opponentIsGameOver: boolean;
+        opponentGameResult: 'won' | 'lost' | 'tie' | null;
         opponentScore: number;
         opponentTimeTaken: number;
       };

@@ -19,7 +19,7 @@ export function HowToPlayInfo() {
       <DialogTrigger asChild>
         <button
           className={cn(
-            `flex w-44 cursor-pointer select-none items-center justify-center gap-2 rounded-base border border-black bg-white py-2 text-black shadow-[1px_1px_rgba(0,0,0),2px_2px_rgba(0,0,0),3px_3px_rgba(0,0,0),4px_4px_rgba(0,0,0),5px_5px_0px_0px_rgba(0,0,0)] transition-all dark:shadow-dark`,
+            `flex w-44 cursor-pointer select-none items-center justify-center gap-2 rounded-base border border-black bg-white py-2 font-base text-black shadow-[1px_1px_rgba(0,0,0),2px_2px_rgba(0,0,0),3px_3px_rgba(0,0,0),4px_4px_rgba(0,0,0),5px_5px_0px_0px_rgba(0,0,0)] transition-all dark:shadow-dark`,
             howToPlayKey ? 'translate-x-boxShadowX translate-y-boxShadowY shadow-none' : ''
           )}
           onMouseDown={() => {

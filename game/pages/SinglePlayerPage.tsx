@@ -11,6 +11,7 @@ import AlphabetList from '../components/AlphabetList';
 import { AlphabetSlot } from '../components/AlphabetSlot';
 import Snowfall from '../components/Snowfall';
 import { UserRecord } from '../shared';
+import { motion } from 'framer-motion';
 
 export const SinglePlayerPage = ({ currentUser }: { currentUser: UserRecord }) => {
   const { gameSettings, setGameSettings } = useGameSettings();
@@ -63,13 +64,14 @@ export const SinglePlayerPage = ({ currentUser }: { currentUser: UserRecord }) =
           };
         });
         sendToDevvit({
-          type: 'UPDATE_USER_STATS',
+          type: 'UPDATE_USER_STATS_SINGLEPLAYER',
           payload: {
-            singleplayer: true,
             win: 'true',
             lose: 'false',
           },
         });
+
+        console.log('ran won');
       } else {
         setGameSettings((prev) => {
           return {
@@ -78,13 +80,14 @@ export const SinglePlayerPage = ({ currentUser }: { currentUser: UserRecord }) =
           };
         });
         sendToDevvit({
-          type: 'UPDATE_USER_STATS',
+          type: 'UPDATE_USER_STATS_SINGLEPLAYER',
           payload: {
-            singleplayer: true,
             win: 'false',
             lose: 'true',
           },
         });
+
+        console.log('ran lose');
       }
 
       setGameSettings((prevSettings) => ({ ...prevSettings, isGameOver: true }));
@@ -111,7 +114,11 @@ export const SinglePlayerPage = ({ currentUser }: { currentUser: UserRecord }) =
       />
       <Snowfall />
       <div className="z-50 flex h-[550px] flex-col items-center pt-16">
-        <div className="relative flex w-[550px] items-center justify-between px-2 py-4 text-[#fc6]">
+        <motion.div
+          className="relative flex w-[550px] items-center justify-between px-2 py-4 text-[#fc6]"
+          initial={{ opacity: 0, y: -25 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
           <div className="flex items-center justify-center">
             {Array.from({ length: gameSettings.startingLives }, (_, index) => {
               const isFilled = index < lives;
@@ -148,7 +155,7 @@ export const SinglePlayerPage = ({ currentUser }: { currentUser: UserRecord }) =
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
         <Card className="w-[550px] bg-[#fc6]">
           <CardHeader className="flex items-center justify-center p-6 text-slate-900">
             <CardTitle
@@ -180,8 +187,9 @@ export const SinglePlayerPage = ({ currentUser }: { currentUser: UserRecord }) =
             answerLetters={answerLetters}
           />
         </Card>
-        <div>
-          {gameSettings.isGameOver && (
+
+        {gameSettings.isGameOver && (
+          <motion.div initial={{ opacity: 0, y: -25 }} animate={{ opacity: 1, y: 0 }}>
             <Card className="flex w-[350px] items-center justify-center gap-4 border-none p-4 shadow-none">
               <Button
                 className="bg-[#fc6]"
@@ -230,8 +238,8 @@ export const SinglePlayerPage = ({ currentUser }: { currentUser: UserRecord }) =
                 <RotateCcw />
               </Button>
             </Card>
-          )}
-        </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );

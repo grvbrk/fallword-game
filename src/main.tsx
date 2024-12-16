@@ -5,6 +5,7 @@ import {
   MatchmakingMessage,
   RealtimeUserMessage,
   REDIS_KEYS,
+  UserData,
   UserRecord,
   UserStats,
   WebviewToBlockMessage,
@@ -65,7 +66,7 @@ Devvit.addCustomPostType({
     const [launched, setLaunched] = useState(false);
     const [userList, setUserList] = useState<Record<string, UserRecord>>({});
     const [currentMultiplayerGameId, setCurrentMultiplayerGameId] = useState<string | null>(null);
-    const { data: currentUser } = useAsync<UserRecord | null>(async () => {
+    const { data: currentUser } = useAsync<UserData | null>(async () => {
       const user = await context.reddit.getCurrentUser();
       if (!user) return null;
       const avatar = await context.reddit.getSnoovatarUrl(user.username);
@@ -78,6 +79,8 @@ Devvit.addCustomPostType({
       };
     });
 
+    // user channel is used to show the "online users" in the webview across users.
+    // manages userList
     const userChannel = useChannel<RealtimeUserMessage>({
       name: 'events',
       onMessage: ({ user, status }) => {
@@ -115,6 +118,7 @@ Devvit.addCustomPostType({
       },
     });
 
+    // Matchmaking channel only to be used for in progress multiplayer games
     const matchmakingChannel = useChannel<MatchmakingMessage>({
       name: 'matchmaking',
       onMessage: ({ type, data }) => {
@@ -139,7 +143,7 @@ Devvit.addCustomPostType({
                 opponentUsername: data.currentUserUsername,
                 opponentLevel: data.currentUserLevel,
                 opponentGameStatus: data.currentUserGameStatus,
-                opponentIsGameOver: data.currentUserIsGameOver,
+                opponentGameResult: data.currentUserGameResult,
                 opponentScore: data.currentUserScore,
                 opponentTimeTaken: data.currentUserTimeTaken,
               },
@@ -181,7 +185,7 @@ Devvit.addCustomPostType({
                       // Add user base data
                       redis.hSet(REDIS_KEYS.USER_LIST, {
                         [currentUser.userId]: JSON.stringify({
-                          username: currentUser.name,
+                          name: currentUser.name,
                           userId: currentUser.userId,
                           avatar: currentUser.avatar,
                         }),
@@ -202,20 +206,20 @@ Devvit.addCustomPostType({
                       // Add user to singleplayer leaderboard
                       redis.zAdd(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, {
                         score: 0,
-                        member: currentUser.name,
+                        member: currentUser.userId,
                       }),
 
                       // Add user to multiplayer leaderboard
-                      redis.zAdd(REDIS_KEYS.LEADERBORD_MULTIPLAYER, {
+                      redis.zAdd(REDIS_KEYS.LEADERBOARD_MULTIPLAYER, {
                         score: 0,
-                        member: currentUser.name,
+                        member: currentUser.userId,
                       }),
                     ]);
 
                     // Get singleplayer and multiplayer ranks
                     const [singleplayerRank, multiplayerRank] = await Promise.all([
-                      redis.zRank(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, currentUser.name),
-                      redis.zRank(REDIS_KEYS.LEADERBORD_MULTIPLAYER, currentUser.name),
+                      redis.zRank(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, currentUser.userId),
+                      redis.zRank(REDIS_KEYS.LEADERBOARD_MULTIPLAYER, currentUser.userId),
                     ]);
 
                     sendMessageToWebview(context, {
@@ -240,16 +244,19 @@ Devvit.addCustomPostType({
                     const userStats = JSON.parse(
                       (await redis.hGet(REDIS_KEYS.USER_STATS, currentUser.userId)) as string
                     ) as UserStats;
+
                     const [singleplayerRank, multiplayerRank] = await Promise.all([
-                      redis.zRank(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, currentUser.name),
-                      redis.zRank(REDIS_KEYS.LEADERBORD_MULTIPLAYER, currentUser.name),
+                      redis.zRank(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, currentUser.userId),
+                      redis.zRank(REDIS_KEYS.LEADERBOARD_MULTIPLAYER, currentUser.userId),
                     ]);
+
                     const userData = {
                       ...currentUser,
                       ...userStats,
                       singleplayerrank: singleplayerRank,
                       multiplayerrank: multiplayerRank,
                     } as UserRecord;
+
                     sendMessageToWebview(context, {
                       type: 'INIT_RESPONSE',
                       payload: {
@@ -283,7 +290,7 @@ Devvit.addCustomPostType({
                   //aggressive
                   setCurrentMultiplayerGameId('123');
                   if (currentUser.userId === 't2_eh5q9bbq') {
-                    // await wait(2);
+                    await wait(2);
                     sendMessageToWebview(context, {
                       type: 'FIND_OPPONENT_RESPONSE',
                       payload: {
@@ -297,7 +304,7 @@ Devvit.addCustomPostType({
 
                   // badsinn
                   if (currentUser.userId === 't2_6fgnqav8') {
-                    // await wait(3);
+                    await wait(3);
                     sendMessageToWebview(context, {
                       type: 'FIND_OPPONENT_RESPONSE',
                       payload: {
@@ -344,51 +351,48 @@ Devvit.addCustomPostType({
 
                   break;
 
-                case 'UPDATE_USER_STATS':
+                case 'UPDATE_USER_STATS_SINGLEPLAYER':
+                  // This case updates only single player leaderboard and user stats
                   if (!currentUser) return;
-                  const { singleplayer, win, lose } = data.payload;
-                  const [userStats, userExistsInSingleLboard, userExistsInMultiLboard] =
-                    await Promise.all([
-                      await redis.hGet(REDIS_KEYS.USER_STATS, currentUser.userId),
-                      await redis.zScore(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, currentUser.name),
-                      await redis.zScore(REDIS_KEYS.LEADERBORD_MULTIPLAYER, currentUser.name),
-                    ]);
 
-                  if (
-                    !userStats ||
-                    userExistsInSingleLboard === undefined ||
-                    userExistsInMultiLboard === undefined
-                  ) {
+                  const { win, lose } = data.payload;
+                  const [userStats, userExistsInSingleLboard] = await Promise.all([
+                    await redis.hGet(REDIS_KEYS.USER_STATS, currentUser.userId),
+                    await redis.zScore(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, currentUser.userId),
+                  ]);
+
+                  if (!userStats || userExistsInSingleLboard === undefined) {
                     return;
                   }
 
                   const stats = JSON.parse(userStats) as UserStats;
-                  if (singleplayer) {
-                    stats.singleplayermatches = (stats.singleplayermatches || 0) + 1;
-                    if (win) {
-                      stats.singleplayerwins = (stats.singleplayerwins || 0) + 1;
-                      const ok = await redis.zIncrBy(
-                        REDIS_KEYS.LEADERBOARD_SINGLEPLAYER,
-                        currentUser.name,
-                        1
-                      );
-                    } else if (lose) {
-                      stats.singleplayerlosses = (stats.singleplayerlosses || 0) + 1;
-                    }
-                  } else {
-                    stats.multiplayermatches = (stats.multiplayermatches || 0) + 1;
-                    if (win) {
-                      stats.multiplayerwins = (stats.multiplayerwins || 0) + 1;
-                      await redis.zIncrBy(REDIS_KEYS.LEADERBORD_MULTIPLAYER, currentUser.name, 1);
-                    } else if (lose) {
-                      stats.multiplayerlosses = (stats.multiplayerlosses || 0) + 1;
-                    }
+                  stats.singleplayermatches = stats.singleplayermatches! + 1;
+                  if (win === 'true') {
+                    stats.singleplayerwins = stats.singleplayerwins! + 1;
+                    // Increase the player's score by 1 if they win
+                    await redis.zIncrBy(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, currentUser.userId, 1);
                   }
+                  if (lose === 'true') {
+                    // No change in the leaderboard if the player loses
+                    stats.singleplayerlosses = stats.singleplayerlosses! + 1;
+                  }
+
+                  // Fetch and update ranks
+                  // const [singleplayerRank, multiplayerRank] = await Promise.all([
+                  //   redis.zRank(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, currentUser.userId),
+                  //   redis.zRank(REDIS_KEYS.LEADERBOARD_MULTIPLAYER, currentUser.userId),
+                  // ]);
+
+                  // stats.singleplayerrank = singleplayerRank;
+                  // stats.multiplayerrank = multiplayerRank;
 
                   await redis.hSet(REDIS_KEYS.USER_STATS, {
                     [currentUser.userId]: JSON.stringify(stats),
                   });
 
+                  // TODO
+                  // Do we need two separate webview calls?
+                  // Can we add just one call which updates both leaderboard and currentUser state?
                   sendMessageToWebview(context, {
                     type: 'USER_STATS_UPDATED',
                     payload: {
@@ -403,6 +407,8 @@ Devvit.addCustomPostType({
                   break;
 
                 case 'OPPONENT_GAME_UPDATES_REQUEST':
+                  // Case triggered only when there's a multiplayer game in progress
+                  // Hence there must be a currentMultiplayerGameId present
                   if (!currentUser) return;
                   const {
                     matchId,
@@ -410,7 +416,7 @@ Devvit.addCustomPostType({
                     currentUserUsername,
                     currentUserLevel,
                     currentUserGameStatus,
-                    currentUserIsGameOver,
+                    currentUserGameResult,
                     currentUserScore,
                     currentUserTimeTaken,
                   } = data.payload;
@@ -424,11 +430,12 @@ Devvit.addCustomPostType({
                       currentUserUsername,
                       currentUserLevel,
                       currentUserGameStatus,
-                      currentUserIsGameOver,
+                      currentUserGameResult,
                       currentUserScore,
                       currentUserTimeTaken,
                     },
                   });
+                  break;
 
                 default:
                   console.error('Unknown message type', data);
