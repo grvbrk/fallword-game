@@ -370,7 +370,11 @@ Devvit.addCustomPostType({
                   if (win === 'true') {
                     stats.singleplayerwins = stats.singleplayerwins! + 1;
                     // Increase the player's score by 1 if they win
-                    await redis.zIncrBy(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, currentUser.userId, 1);
+                    await redis.zIncrBy(
+                      REDIS_KEYS.LEADERBOARD_SINGLEPLAYER,
+                      currentUser.userId,
+                      -1
+                    );
                   }
                   if (lose === 'true') {
                     // No change in the leaderboard if the player loses
@@ -378,13 +382,13 @@ Devvit.addCustomPostType({
                   }
 
                   // Fetch and update ranks
-                  // const [singleplayerRank, multiplayerRank] = await Promise.all([
-                  //   redis.zRank(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, currentUser.userId),
-                  //   redis.zRank(REDIS_KEYS.LEADERBOARD_MULTIPLAYER, currentUser.userId),
-                  // ]);
+                  const [singleplayerRank, multiplayerRank] = await Promise.all([
+                    redis.zRank(REDIS_KEYS.LEADERBOARD_SINGLEPLAYER, currentUser.userId),
+                    redis.zRank(REDIS_KEYS.LEADERBOARD_MULTIPLAYER, currentUser.userId),
+                  ]);
 
-                  // stats.singleplayerrank = singleplayerRank;
-                  // stats.multiplayerrank = multiplayerRank;
+                  stats.singleplayerrank = singleplayerRank;
+                  stats.multiplayerrank = multiplayerRank;
 
                   await redis.hSet(REDIS_KEYS.USER_STATS, {
                     [currentUser.userId]: JSON.stringify(stats),

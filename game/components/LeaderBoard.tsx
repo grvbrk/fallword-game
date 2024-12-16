@@ -39,7 +39,7 @@ export default function LeaderBoard({ leaderboard }: { leaderboard: LeaderboardD
                     <div className="w-full truncate">{idx + 1}</div>
                     <div className="w-full truncate">{'u/' + user.username}</div>
                     <div className="w-full truncate">{user.matches}</div>
-                    <div className="w-full truncate">{user.score}</div>
+                    <div className="w-full truncate">{Math.abs(user.score)}</div>
                     <Separator className="my-2" />
                   </div>
                 ))}
@@ -63,7 +63,7 @@ export default function LeaderBoard({ leaderboard }: { leaderboard: LeaderboardD
                     <div className="w-full truncate">{idx + 1}</div>
                     <div className="w-full truncate">{'u/' + user.username}</div>
                     <div className="w-full truncate">{user.matches}</div>
-                    <div className="w-full truncate">{user.score}</div>
+                    <div className="w-full truncate">{Math.abs(user.score)}</div>
                     <Separator className="my-2" />
                   </div>
                 ))}

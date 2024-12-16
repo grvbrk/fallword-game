@@ -9,8 +9,8 @@ export async function getLeaderboardsData(redis: RedisClient) {
   ]);
 
   // Manual sorting because {reverse: true, by : "score"} is not working
-  singleplayerUsernames.sort((a, b) => b.score - a.score);
-  multiplayerUsernames.sort((a, b) => b.score - a.score);
+  // singleplayerUsernames.sort((a, b) => b.score - a.score);
+  // multiplayerUsernames.sort((a, b) => b.score - a.score);
 
   // Fetch scores and stats for singleplayer leaderboard
   const singleplayerLeaderboard = await Promise.all(
