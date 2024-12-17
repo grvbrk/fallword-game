@@ -18,6 +18,13 @@ export type RequestBodyType = {
   userId: string;
 };
 
+// interface MatchResponse {
+//   status: 'matched' | 'no_match';
+//   userId: string;
+//   opponentId?: string;
+//   matchId?: string;
+// }
+
 export type ResponseBodyType = {
   status: 'matched' | 'no_match';
   opponentId?: string;

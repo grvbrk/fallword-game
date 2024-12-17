@@ -5,6 +5,7 @@ import {
   MatchmakingMessage,
   RealtimeUserMessage,
   REDIS_KEYS,
+  ResponseBodyType,
   UserData,
   UserRecord,
   UserStats,
@@ -71,59 +72,6 @@ Devvit.addCustomPostType({
     const [launched, setLaunched] = useState(false);
     const [userList, setUserList] = useState<Record<string, UserRecord>>({});
     const [currentMultiplayerGameId, setCurrentMultiplayerGameId] = useState<string | null>(null);
-    // const [matchmakingRetries, setMatchmakingRetries] = useState<number>(0);
-
-    // const updateInterval = useInterval(async () => {
-    //   // Runs every 5 seconds
-    //   try {
-    //     if (matchmakingRetries === 3) {
-    //       setMatchmakingRetries(0);
-    //       sendMessageToWebview(context, {
-    //         type: 'FIND_OPPONENT_RESPONSE',
-    //         payload: {
-    //           matchId: undefined,
-    //           foundOpponent: true,
-    //           opponentId: undefined,
-    //           opponentUsername: undefined,
-    //         },
-    //       });
-    //       return;
-    //     }
-
-    //     // Retrieve the top 2 players (sorted by entry time)
-    //     const players = await redis.zRange(REDIS_KEYS.MATCHMAKER, 0, -1);
-
-    //     if (players.length >= 2) {
-    //       const [player1, player2] = players;
-
-    //       matchmakingChannel.send({
-    //         type: 'OPPONENT_CONFIRMATION',
-    //         data: {},
-    //       });
-
-    //       // sendMessageToWebview(context, {
-    //       //   type: 'FIND_OPPONENT_RESPONSE',
-    //       //   payload: {
-    //       //     matchId: '123',
-    //       //     foundOpponent: true,
-    //       //     opponentId: 't2_6fgnqav8',
-    //       //     opponentUsername: 'badsinn',
-    //       //   },
-    //       // });
-
-    //       // Remove the matched players from the sortedSet
-    //       await redis.zRem(REDIS_KEYS.MATCHMAKER, [player1.member, player2.member]);
-    //     } else {
-    //       setMatchmakingRetries(matchmakingRetries + 1);
-    //       console.log('Not enough players in matchmaking. Waiting for more...');
-    //     }
-    //   } catch (error) {
-    //     setMatchmakingRetries(0);
-    //     console.error('Error running matchmaking scheduler:', error);
-    //   }
-    // }, 5000);
-
-    // updateInterval.start();
 
     const { data: currentUser } = useAsync<UserData | null>(async () => {
       const user = await context.reddit.getCurrentUser();
@@ -185,16 +133,6 @@ Devvit.addCustomPostType({
 
         switch (type) {
           case 'GAME_UPDATES':
-            // console.log(
-            //   'GAME_UPDATES triggered',
-            //   currentUser,
-            //   data.sessionId,
-            //   currentSessionId,
-            //   data.currentUserUsername,
-            //   currentUser.name,
-            //   currentMultiplayerGameId,
-            //   data.matchId
-            // );
             if (
               !currentUser ||
               data.sessionId === currentSessionId ||
@@ -354,115 +292,132 @@ Devvit.addCustomPostType({
                 case 'FIND_OPPONENT_REQUEST':
                   if (!currentUser) return;
 
-                  // const userExistsInMatchmaking = await redis.zScore(
-                  //   REDIS_KEYS.MATCHMAKER,
-                  //   currentUser.userId
-                  // );
-                  // if (userExistsInMatchmaking) {
-                  //   return;
-                  // }
-
-                  // await redis.zAdd(REDIS_KEYS.MATCHMAKER, {
-                  //   member: currentUser.userId,
-                  //   score: Date.now(),
-                  // });
-
-                  // break;
-
                   // Custom response to test and design webview ui.
                   // To be used only for testing multiplayer
                   // ....................................................
                   //aggressive
-                  setCurrentMultiplayerGameId('123');
-                  if (currentUser.userId === 't2_eh5q9bbq') {
-                    // await wait(2);
-                    sendMessageToWebview(context, {
-                      type: 'FIND_OPPONENT_RESPONSE',
-                      payload: {
-                        matchId: '123',
-                        foundOpponent: true,
-                        opponentId: 't2_6fgnqav8',
-                        opponentUsername: 'badsinn',
-                      },
-                    });
-                    break;
-                  }
-
-                  // // badsinn
-                  if (currentUser.userId === 't2_6fgnqav8') {
-                    // await wait(3);
-                    sendMessageToWebview(context, {
-                      type: 'FIND_OPPONENT_RESPONSE',
-                      payload: {
-                        matchId: '123',
-                        foundOpponent: true,
-                        opponentId: 't2_eh5q9bbq',
-                        opponentUsername: 'aggressive',
-                      },
-                    });
-                    break;
-                  }
-
-                  // ....................................................
-
-                  // const matchmaking_url = await context.settings.get('matchmaking_url');
-                  // try {
-                  //   const response = await fetch(matchmaking_url as string, {
-                  //     method: 'POST',
-                  //     body: JSON.stringify({
-                  //       userId: currentUser.userId,
-                  //     }),
-                  //   });
-
-                  //   if (response.status !== 200) {
-                  //     sendMessageToWebview(context, {
-                  //       type: 'FIND_OPPONENT_RESPONSE',
-                  //       payload: {
-                  //         foundOpponent: false,
-                  //         matchId: undefined,
-                  //         opponentId: undefined,
-                  //         opponentUsername: undefined,
-                  //       },
-                  //     });
-
-                  //     break;
-                  //   }
-
-                  //   const resData = (await response.json()) as ResponseBodyType;
-                  //   console.log('MATCHMAKING RESPONSE', resData);
-                  //   if (resData.status === 'no_match') {
-                  //     sendMessageToWebview(context, {
-                  //       type: 'FIND_OPPONENT_RESPONSE',
-                  //       payload: {
-                  //         foundOpponent: false,
-                  //         matchId: undefined,
-                  //         opponentId: undefined,
-                  //         opponentUsername: undefined,
-                  //       },
-                  //     });
-                  //   } else {
-                  //     sendMessageToWebview(context, {
-                  //       type: 'FIND_OPPONENT_RESPONSE',
-                  //       payload: {
-                  //         foundOpponent: true,
-                  //         matchId: resData.matchId,
-                  //         opponentId: resData.opponentId,
-                  //         opponentUsername: undefined,
-                  //       },
-                  //     });
-                  //   }
-                  // } catch (error) {
-                  //   console.log('ERROR MATCHMAKING USER', error);
+                  // setCurrentMultiplayerGameId('123');
+                  // if (currentUser.userId === 't2_eh5q9bbq') {
+                  //   // await wait(2);
                   //   sendMessageToWebview(context, {
                   //     type: 'FIND_OPPONENT_RESPONSE',
                   //     payload: {
-                  //       foundOpponent: false,
-                  //       matchId: undefined,
-                  //       opponentId: undefined,
-                  //       opponentUsername: undefined,
+                  //       matchId: '123',
+                  //       foundOpponent: true,
+                  //       opponentId: 't2_6fgnqav8',
+                  //       opponentUsername: 'badsinn',
                   //     },
                   //   });
+                  //   break;
                   // }
+
+                  // // badsinn
+                  // if (currentUser.userId === 't2_6fgnqav8') {
+                  //   // await wait(3);
+                  //   sendMessageToWebview(context, {
+                  //     type: 'FIND_OPPONENT_RESPONSE',
+                  //     payload: {
+                  //       matchId: '123',
+                  //       foundOpponent: true,
+                  //       opponentId: 't2_eh5q9bbq',
+                  //       opponentUsername: 'aggressive',
+                  //     },
+                  //   });
+                  //   break;
+                  // }
+
+                  // .............d.......................................
+
+                  const matchmaking_url = await context.settings.get('matchmaking_url');
+                  try {
+                    const response = await fetch((matchmaking_url + '/match') as string, {
+                      method: 'POST',
+                      body: JSON.stringify({
+                        userId: currentUser.userId,
+                      }),
+                    });
+
+                    if (response.status !== 200) {
+                      sendMessageToWebview(context, {
+                        type: 'FIND_OPPONENT_RESPONSE',
+                        payload: {
+                          foundOpponent: false,
+                          matchId: undefined,
+                          opponentId: undefined,
+                          opponentUsername: undefined,
+                        },
+                      });
+
+                      break;
+                    }
+
+                    const { jobId } = (await response.json()) as { jobId: string };
+                    console.log('MATCHMAKING RESPONSE', jobId);
+                    if (!jobId) {
+                      sendMessageToWebview(context, {
+                        type: 'FIND_OPPONENT_RESPONSE',
+                        payload: {
+                          foundOpponent: false,
+                          matchId: undefined,
+                          opponentId: undefined,
+                          opponentUsername: undefined,
+                        },
+                      });
+                    } else {
+                      const response = await fetch((matchmaking_url + '/health') as string, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                          jobId,
+                        }),
+                      });
+                      if (response.status !== 200) {
+                        sendMessageToWebview(context, {
+                          type: 'FIND_OPPONENT_RESPONSE',
+                          payload: {
+                            foundOpponent: false,
+                            matchId: undefined,
+                            opponentId: undefined,
+                            opponentUsername: undefined,
+                          },
+                        });
+                        break;
+                      }
+
+                      const data = (await response.json()) as ResponseBodyType;
+                      console.log('MATCHMAKING RESPONSE DATA', data);
+                      if (data.status === 'no_match') {
+                        sendMessageToWebview(context, {
+                          type: 'FIND_OPPONENT_RESPONSE',
+                          payload: {
+                            foundOpponent: false,
+                            matchId: undefined,
+                            opponentId: undefined,
+                            opponentUsername: undefined,
+                          },
+                        });
+                      } else {
+                        sendMessageToWebview(context, {
+                          type: 'FIND_OPPONENT_RESPONSE',
+                          payload: {
+                            foundOpponent: true,
+                            matchId: data.matchId,
+                            opponentId: data.opponentId,
+                          },
+                        });
+                      }
+                    }
+                  } catch (error) {
+                    console.log('ERROR MATCHMAKING USER', error);
+                    sendMessageToWebview(context, {
+                      type: 'FIND_OPPONENT_RESPONSE',
+                      payload: {
+                        foundOpponent: false,
+                        matchId: undefined,
+                        opponentId: undefined,
+                        opponentUsername: undefined,
+                      },
+                    });
+                  }
 
                   break;
 
@@ -631,6 +586,7 @@ Devvit.addCustomPostType({
                   });
 
                   break;
+
                 default:
                   console.error('Unknown message type', data);
                   break;
