@@ -70,8 +70,6 @@ export const SinglePlayerPage = ({ currentUser }: { currentUser: UserRecord }) =
             lose: 'false',
           },
         });
-
-        console.log('ran won');
       } else {
         setGameSettings((prev) => {
           return {
@@ -86,8 +84,6 @@ export const SinglePlayerPage = ({ currentUser }: { currentUser: UserRecord }) =
             lose: 'true',
           },
         });
-
-        console.log('ran lose');
       }
 
       setGameSettings((prevSettings) => ({ ...prevSettings, isGameOver: true }));

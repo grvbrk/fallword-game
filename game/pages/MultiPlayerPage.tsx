@@ -34,7 +34,6 @@ export const MultiPlayerPage = ({ currentUser }: { currentUser: UserRecord }) =>
 
   useEffect(() => {
     if (userGameResult === 'won' && opponentGameResult === 'lost') {
-      console.log('ran');
       sendToDevvit({
         type: 'GAME_OVER_MULTIPLAYER',
         payload: {
@@ -116,7 +115,7 @@ export const MultiPlayerPage = ({ currentUser }: { currentUser: UserRecord }) =>
       />
       <Snowfall />
       {opponentFound ? (
-        <div className="flex flex-col">
+        <div className="flex w-[700px] flex-col border-2 md:w-[900px]">
           <div className="flex">
             <UserUpdatesTracker
               userGameResult={userGameResult}

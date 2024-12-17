@@ -10,7 +10,6 @@ import Timer from './Timer';
 
 export default function MultiplayerGameMain() {
   const { user, updateUserState } = useGameStore();
-  // const setPage = useSetPage();
 
   const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
   const [lives, setLives] = useState<number>(5);
@@ -123,32 +122,6 @@ export default function MultiplayerGameMain() {
 
   if (user.gameStatus === 'finished') {
     return null;
-    // return (
-    //   <div className="flex h-full items-center justify-center">
-    //     <Card className="bg-[#fc6] text-black">
-    //       <CardHeader>
-    //         <CardTitle>Game Over</CardTitle>
-    //       </CardHeader>
-    //       <CardContent>
-    //         <p>Final Score: {user.score}</p>
-    //         <p>Game Status: {user.gameStatus}</p>
-    //         <p>Time Taken: {user.timeTaken} seconds</p>
-    //       </CardContent>
-    //       <CardFooter className="flex w-[350px] items-center justify-center gap-4 border-none p-4 shadow-none">
-    //         <Button
-    //           className="bg-black text-[#fc6] hover:bg-black hover:text-[#fc6]"
-    //           onClick={() => {
-    //             reset();
-    //             setPage('home');
-    //           }}
-    //         >
-    //           <MoveLeft />
-    //           Return to Main Menu
-    //         </Button>
-    //       </CardFooter>
-    //     </Card>
-    //   </div>
-    // );
   }
 
   return (
@@ -158,7 +131,7 @@ export default function MultiplayerGameMain() {
           <Confetti recycle={false} />
         </>
       )}
-      <div className="relative flex w-[420px] items-center justify-between px-2 py-4 text-[#fc6]">
+      <div className="relative flex w-full items-center justify-between px-2 py-4 text-[#fc6]">
         <div className="flex items-center justify-center">
           {Array.from({ length: 5 }, (_, index) => {
             const isFilled = index < lives;
@@ -182,8 +155,8 @@ export default function MultiplayerGameMain() {
           />
         </div>
       </div>
-      <Card className="w-[420px] bg-[#fc6]">
-        <CardHeader className="flex items-center justify-center p-6 text-slate-900">
+      <Card className="w-full bg-[#fc6]">
+        <CardHeader className="flex items-center justify-center py-6 text-slate-900">
           <CardTitle
             className="max-h-20 overflow-y-auto text-center text-xl"
             style={{ wordWrap: 'break-word' }}
@@ -205,7 +178,7 @@ export default function MultiplayerGameMain() {
           </div>
         </CardContent>
       </Card>
-      <Card className="w-[420px] border-none p-4 shadow-none">
+      <Card className="w-full border-none p-4 shadow-none">
         <AlphabetList
           isGameOver={(user.gameStatus as 'waiting' | 'in-progress' | 'finished') === 'finished'}
           setGuessedLetters={setGuessedLetters}

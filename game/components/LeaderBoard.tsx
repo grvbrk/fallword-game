@@ -7,7 +7,6 @@ import { Separator } from './ui/separator';
 import { LeaderboardDataType } from '../shared';
 
 export default function LeaderBoard({ leaderboard }: { leaderboard: LeaderboardDataType }) {
-  console.log(leaderboard);
   return (
     <Dialog>
       <DialogTrigger asChild>

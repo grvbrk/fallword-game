@@ -126,6 +126,16 @@ Devvit.addCustomPostType({
 
         switch (type) {
           case 'GAME_UPDATES':
+            console.log(
+              'GAME_UPDATES triggered',
+              currentUser,
+              data.sessionId,
+              currentSessionId,
+              data.currentUserUsername,
+              currentUser.name,
+              currentMultiplayerGameId,
+              data.matchId
+            );
             if (
               !currentUser ||
               data.sessionId === currentSessionId ||
@@ -135,6 +145,8 @@ Devvit.addCustomPostType({
             ) {
               return;
             }
+
+            console.log('OPPONENT_GAME_UPDATES_REQUEST triggered');
 
             sendMessageToWebview(context, {
               type: 'OPPONENT_GAME_UPDATES_RESPONSE',
@@ -288,66 +300,92 @@ Devvit.addCustomPostType({
                   // Custom response to test and design webview ui.
                   // To be used only for testing multiplayer
                   //aggressive
-                  setCurrentMultiplayerGameId('123');
-                  if (currentUser.userId === 't2_eh5q9bbq') {
-                    // await wait(2);
-                    sendMessageToWebview(context, {
-                      type: 'FIND_OPPONENT_RESPONSE',
-                      payload: {
-                        matchId: '123',
-                        foundOpponent: true,
-                        opponentId: 't2_6fgnqav8',
-                        opponentUsername: 'badsinn',
-                      },
-                    });
-                  }
-
-                  // badsinn
-                  if (currentUser.userId === 't2_6fgnqav8') {
-                    // await wait(3);
-                    sendMessageToWebview(context, {
-                      type: 'FIND_OPPONENT_RESPONSE',
-                      payload: {
-                        matchId: '123',
-                        foundOpponent: true,
-                        opponentId: 't2_eh5q9bbq',
-                        opponentUsername: 'aggressive',
-                      },
-                    });
-                  }
-
-                  // const matchmaking_url = await context.settings.get('matchmaking_url');
-                  // const response = await fetch(matchmaking_url as string, {
-                  //   method: 'POST',
-                  //   body: JSON.stringify({
-                  //     userId: currentUser.userId,
-                  //   }),
-                  // });
-
-                  // if (response.status !== 200) {
+                  // setCurrentMultiplayerGameId('123');
+                  // if (currentUser.userId === 't2_eh5q9bbq') {
+                  //   // await wait(2);
                   //   sendMessageToWebview(context, {
                   //     type: 'FIND_OPPONENT_RESPONSE',
                   //     payload: {
-                  //       foundOpponent: false,
-                  //       matchId: undefined,
-                  //       opponentId: undefined,
-                  //       opponentUsername: undefined,
+                  //       matchId: '123',
+                  //       foundOpponent: true,
+                  //       opponentId: 't2_6fgnqav8',
+                  //       opponentUsername: 'badsinn',
                   //     },
                   //   });
-
-                  //   break;
                   // }
 
-                  // const resData = (await response.json()) as ResponseBodyType;
-                  // sendMessageToWebview(context, {
-                  //   type: 'FIND_OPPONENT_RESPONSE',
-                  //   payload: {
-                  //     foundOpponent: true,
-                  //     matchId: resData.matchId,
-                  //     opponentId: resData.opponentId,
-                  //     opponentUsername: undefined,
-                  //   },
-                  // });
+                  // // badsinn
+                  // if (currentUser.userId === 't2_6fgnqav8') {
+                  //   // await wait(3);
+                  //   sendMessageToWebview(context, {
+                  //     type: 'FIND_OPPONENT_RESPONSE',
+                  //     payload: {
+                  //       matchId: '123',
+                  //       foundOpponent: true,
+                  //       opponentId: 't2_eh5q9bbq',
+                  //       opponentUsername: 'aggressive',
+                  //     },
+                  //   });
+                  // }
+
+                  const matchmaking_url = await context.settings.get('matchmaking_url');
+                  try {
+                    const response = await fetch(matchmaking_url as string, {
+                      method: 'POST',
+                      body: JSON.stringify({
+                        userId: currentUser.userId,
+                      }),
+                    });
+
+                    if (response.status !== 200) {
+                      sendMessageToWebview(context, {
+                        type: 'FIND_OPPONENT_RESPONSE',
+                        payload: {
+                          foundOpponent: false,
+                          matchId: undefined,
+                          opponentId: undefined,
+                          opponentUsername: undefined,
+                        },
+                      });
+
+                      break;
+                    }
+
+                    const resData = await response.json();
+                    console.log('MATCHMAKING RESPONSE', resData);
+                    if (resData.status === 'no_match') {
+                      sendMessageToWebview(context, {
+                        type: 'FIND_OPPONENT_RESPONSE',
+                        payload: {
+                          foundOpponent: false,
+                          matchId: undefined,
+                          opponentId: undefined,
+                          opponentUsername: undefined,
+                        },
+                      });
+                    } else {
+                      sendMessageToWebview(context, {
+                        type: 'FIND_OPPONENT_RESPONSE',
+                        payload: {
+                          foundOpponent: true,
+                          matchId: resData.matchId,
+                          opponentId: resData.opponentId,
+                          opponentUsername: undefined,
+                        },
+                      });
+                    }
+                  } catch (error) {
+                    console.log('ERROR MATCHMAKING USER', error);
+                    sendMessageToWebview(context, {
+                      type: 'FIND_OPPONENT_RESPONSE',
+                      payload: {
+                        foundOpponent: false,
+                        matchId: undefined,
+                        opponentId: undefined,
+                        opponentUsername: undefined,
+                      },
+                    });
+                  }
 
                   break;
 
