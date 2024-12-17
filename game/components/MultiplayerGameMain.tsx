@@ -155,17 +155,17 @@ export default function MultiplayerGameMain() {
           />
         </div>
       </div>
-      <Card className="w-full bg-[#fc6]">
-        <CardHeader className="flex items-center justify-center py-6 text-slate-900">
+      <Card className="max-w-72 border-none bg-[#fc6] md:w-full">
+        <CardHeader className="flex items-center justify-center text-slate-900">
           <CardTitle
-            className="max-h-20 overflow-y-auto text-center text-xl"
+            className="max-h-24 overflow-y-auto text-center text-lg md:text-xl"
             style={{ wordWrap: 'break-word' }}
           >
             {user.userQuestions[currentLevel - 1].question}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center gap-2 text-2xl text-slate-900">
+          <div className="flex flex-wrap items-center justify-center gap-2 text-lg text-slate-900 md:text-2xl">
             {answerLetters.map((letter, idx) => {
               return (
                 <AlphabetSlot
@@ -178,7 +178,7 @@ export default function MultiplayerGameMain() {
           </div>
         </CardContent>
       </Card>
-      <Card className="w-full border-none p-4 shadow-none">
+      <Card className="max-w-72 border-none p-4 shadow-none md:w-full">
         <AlphabetList
           isGameOver={(user.gameStatus as 'waiting' | 'in-progress' | 'finished') === 'finished'}
           setGuessedLetters={setGuessedLetters}

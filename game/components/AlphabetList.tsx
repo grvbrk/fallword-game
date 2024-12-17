@@ -52,7 +52,7 @@ export default function AlphabetList({
           <NeoButton
             key={letter}
             className={cn(
-              `h-9 w-9 rounded-xl text-lg font-semibold text-slate-900 shadow-light`,
+              `h-8 w-8 rounded-xl text-base font-semibold text-slate-900 shadow-light md:h-9 md:w-9 md:text-lg`,
               isVowel(letter) && 'bg-black text-white',
               activeKey === letter
                 ? 'translate-x-boxShadowX translate-y-boxShadowY shadow-none'

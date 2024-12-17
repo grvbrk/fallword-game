@@ -5,6 +5,7 @@ import {
   MatchmakingMessage,
   RealtimeUserMessage,
   REDIS_KEYS,
+  ResponseBodyType,
   UserData,
   UserRecord,
   UserStats,
@@ -351,7 +352,7 @@ Devvit.addCustomPostType({
                       break;
                     }
 
-                    const resData = await response.json();
+                    const resData = (await response.json()) as ResponseBodyType;
                     console.log('MATCHMAKING RESPONSE', resData);
                     if (resData.status === 'no_match') {
                       sendMessageToWebview(context, {

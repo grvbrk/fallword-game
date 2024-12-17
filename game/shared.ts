@@ -13,6 +13,16 @@ export const REDIS_TTL = {
   DEV: 300, // 5 minutes
 };
 
+export type RequestBodyType = {
+  userId: string;
+};
+
+export type ResponseBodyType = {
+  status: 'matched' | 'no_match';
+  opponentId?: string;
+  matchId?: string;
+};
+
 export type UserStats = {
   singleplayermatches?: number;
   singleplayerwins?: number;

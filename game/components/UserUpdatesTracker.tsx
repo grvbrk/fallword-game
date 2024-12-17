@@ -40,12 +40,12 @@ export default function UserUpatesTracker({
       {userGameResult != null && userGameResult}
       <Card className="mx-5 border-none bg-[#fc6] shadow-[1px_1px_rgba(0,0,0),2px_2px_rgba(0,0,0),3px_3px_rgba(0,0,0),4px_4px_rgba(0,0,0),5px_5px_0px_0px_rgba(0,0,0)]">
         <CardContent className="flex flex-col p-4 text-black">
-          <div className="flex items-center justify-between gap-4 text-center text-sm">
+          <div className="flex w-[130px] items-center justify-between gap-4 text-center text-sm md:w-full">
             <div className="flex w-full items-center justify-start gap-1 font-bold">
               <EthernetPort className="h-3 w-3" />
               <p>Status</p>
             </div>
-            <p className="w-full text-right">{gameStatus}</p>
+            <p className="w-full truncate text-right">{gameStatus}</p>
           </div>
           <div className="flex items-center justify-between gap-4 text-center text-sm">
             <div className="flex w-full items-center justify-start gap-1 font-bold">

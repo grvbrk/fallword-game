@@ -9,13 +9,13 @@ export function AlphabetSlot({ letter, guessed }: { letter: string; guessed: boo
       {space ? (
         <div className="w-5" />
       ) : vowel ? (
-        <div className="flex h-10 w-10 items-center justify-center border-b-2 font-semibold">
+        <div className="flex h-5 w-5 items-center justify-center border-b-2 font-semibold md:h-10 md:w-10">
           {letter}
         </div>
       ) : (
         <div
           className={cn(
-            'flex h-10 w-10 items-center justify-center border-b-2 font-semibold',
+            'flex h-5 w-5 items-center justify-center border-b-2 font-semibold md:h-10 md:w-10',
             guessed && 'text-green-600'
           )}
         >
