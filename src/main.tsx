@@ -326,11 +326,11 @@ Devvit.addCustomPostType({
                   //   break;
                   // }
 
-                  // .............d.......................................
+                  // ....................................................
 
                   const matchmaking_url = await context.settings.get('matchmaking_url');
                   try {
-                    const response = await fetch((matchmaking_url + '/match') as string, {
+                    const response = await fetch((matchmaking_url + 'match') as string, {
                       method: 'POST',
                       body: JSON.stringify({
                         userId: currentUser.userId,
@@ -364,7 +364,7 @@ Devvit.addCustomPostType({
                         },
                       });
                     } else {
-                      const response = await fetch((matchmaking_url + '/health') as string, {
+                      const response = await fetch((matchmaking_url + 'health') as string, {
                         method: 'POST',
                         body: JSON.stringify({
                           jobId,
