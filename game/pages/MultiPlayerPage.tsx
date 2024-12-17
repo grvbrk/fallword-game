@@ -13,6 +13,7 @@ import OpponentUpdatesTracker from '../components/OpponentUpdatesTracker';
 import Snowfall from '../components/Snowfall';
 import UserUpdatesTracker from '../components/UserUpdatesTracker';
 import { motion } from 'framer-motion';
+import Confetti from 'react-confetti';
 
 export const MultiPlayerPage = ({ currentUser }: { currentUser: UserRecord }) => {
   const [opponentFound, setOpponentFound] = useState<boolean>(false);
@@ -48,57 +49,57 @@ export const MultiPlayerPage = ({ currentUser }: { currentUser: UserRecord }) =>
   }, [userGameResult, opponentGameResult]);
 
   // Uncomment this when using npm run dev
-  // useEffect(() => {
-  //   if (opponentData && opponentData.foundOpponent) {
-  //     updateUserState({
-  //       userId: currentUser.userId,
-  //       username: currentUser.name,
-  //       userQuestions: generateMultiplayerQuestions(),
-  //       userLevel: 1,
-  //       gameStatus: 'waiting',
-  //       gameResult: undefined,
-  //       score: 0,
-  //       timeTaken: 0,
-  //       matchId: opponentData.matchId,
-  //     });
-  //     updateOpponentState({
-  //       opponentUsername: opponentData.opponentUsername,
-  //       opponentLevel: 1,
-  //       opponentGameStatus: 'waiting',
-  //       opponentGameResult: undefined,
-  //       opponentScore: 0,
-  //       opponentTimeTaken: 0,
-  //       opponentId: opponentData.opponentId,
-  //       matchId: opponentData.matchId,
-  //     });
-  //     setOpponentFound(true);
-  //   } else {
-  //     setOpponentFound(false);
-  //   }
-  // }, [opponentData]);
+  useEffect(() => {
+    if (opponentData && opponentData.foundOpponent) {
+      updateUserState({
+        userId: currentUser.userId,
+        username: currentUser.name,
+        userQuestions: generateMultiplayerQuestions(),
+        userLevel: 1,
+        gameStatus: 'waiting',
+        gameResult: undefined,
+        score: 0,
+        timeTaken: 0,
+        matchId: opponentData.matchId,
+      });
+      updateOpponentState({
+        opponentUsername: opponentData.opponentUsername,
+        opponentLevel: 1,
+        opponentGameStatus: 'waiting',
+        opponentGameResult: undefined,
+        opponentScore: 0,
+        opponentTimeTaken: 0,
+        opponentId: opponentData.opponentId,
+        matchId: opponentData.matchId,
+      });
+      setOpponentFound(true);
+    } else {
+      setOpponentFound(false);
+    }
+  }, [opponentData]);
 
   // Uncomment this when using npm run vite
 
-  useEffect(() => {
-    updateUserState({
-      username: currentUser.name,
-      userQuestions: generateMultiplayerQuestions(),
-      userLevel: 1,
-      gameStatus: 'waiting',
-      gameResult: undefined,
-      score: 0,
-      timeTaken: 0,
-    });
-    updateOpponentState({
-      opponentUsername: opponentData?.opponentUsername,
-      opponentLevel: 1,
-      opponentGameStatus: 'finished',
-      opponentGameResult: undefined,
-      opponentScore: 0,
-      opponentTimeTaken: 0,
-    });
-    setOpponentFound(true);
-  }, []);
+  // useEffect(() => {
+  //   updateUserState({
+  //     username: currentUser.name,
+  //     userQuestions: generateMultiplayerQuestions(),
+  //     userLevel: 1,
+  //     gameStatus: 'waiting',
+  //     gameResult: undefined,
+  //     score: 0,
+  //     timeTaken: 0,
+  //   });
+  //   updateOpponentState({
+  //     opponentUsername: opponentData?.opponentUsername,
+  //     opponentLevel: 1,
+  //     opponentGameStatus: 'finished',
+  //     opponentGameResult: undefined,
+  //     opponentScore: 0,
+  //     opponentTimeTaken: 0,
+  //   });
+  //   setOpponentFound(true);
+  // }, []);
 
   return (
     <div
@@ -115,39 +116,53 @@ export const MultiPlayerPage = ({ currentUser }: { currentUser: UserRecord }) =>
       />
       <Snowfall />
       {opponentFound ? (
-        <div className="flex max-w-[700px] flex-col md:w-[900px]">
-          <div className="flex items-center justify-center">
-            <UserUpdatesTracker
-              userGameResult={userGameResult}
-              setUserGameResult={setUserGameResult}
-            />
-            <div className="z-50 flex flex-col pt-16">
-              <MultiplayerGameMain />
+        <>
+          {userGameResult === 'won' && <Confetti recycle={false} numberOfPieces={1000} />}
+          <div className="relative flex max-w-[700px] flex-col md:w-[900px]">
+            <div className="flex items-center justify-center pb-10">
+              {userGameResult === 'won' ? (
+                <div className="text-bold text-3xl text-[#fc6]">You Win! </div>
+              ) : userGameResult === 'lost' ? (
+                <div className="text-bold text-3xl text-[#fc6]">You Lost! </div>
+              ) : (
+                userGameResult === 'tie' && (
+                  <div className="text-bold text-3xl text-[#fc6]">Game Tied! </div>
+                )
+              )}
             </div>
-            <OpponentUpdatesTracker
-              opponentGameResult={opponentGameResult}
-              setOpponentGameResult={setOpponentGameResult}
-            />
-          </div>
-          {user.gameStatus === 'finished' && opponent.opponentGameStatus === 'finished' ? (
-            <motion.div
-              className="z-50 flex h-full w-full items-center justify-center"
-              initial={{ opacity: 0, y: 25 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <Button
-                className="w-52 bg-[#fc6]"
-                onClick={() => {
-                  reset();
-                  setPage('home');
-                }}
+            <div className="flex items-center justify-center">
+              <UserUpdatesTracker
+                userGameResult={userGameResult}
+                setUserGameResult={setUserGameResult}
+              />
+              <div className="z-50 flex flex-col pt-16">
+                <MultiplayerGameMain />
+              </div>
+              <OpponentUpdatesTracker
+                opponentGameResult={opponentGameResult}
+                setOpponentGameResult={setOpponentGameResult}
+              />
+            </div>
+            {user.gameStatus === 'finished' && opponent.opponentGameStatus === 'finished' ? (
+              <motion.div
+                className="z-50 flex h-full w-full items-center justify-center"
+                initial={{ opacity: 0, y: 25 }}
+                animate={{ opacity: 1, y: 0 }}
               >
-                <MoveLeft />
-                Return to Main Menu
-              </Button>
-            </motion.div>
-          ) : null}
-        </div>
+                <Button
+                  className="w-52 bg-[#fc6]"
+                  onClick={() => {
+                    reset();
+                    setPage('home');
+                  }}
+                >
+                  <MoveLeft />
+                  Return to Main Menu
+                </Button>
+              </motion.div>
+            ) : null}
+          </div>
+        </>
       ) : (
         <FindingOppLoading opponentData={opponentData} />
       )}

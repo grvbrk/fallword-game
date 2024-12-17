@@ -300,34 +300,39 @@ Devvit.addCustomPostType({
 
                   // Custom response to test and design webview ui.
                   // To be used only for testing multiplayer
+                  // ....................................................
                   //aggressive
-                  // setCurrentMultiplayerGameId('123');
-                  // if (currentUser.userId === 't2_eh5q9bbq') {
-                  //   // await wait(2);
-                  //   sendMessageToWebview(context, {
-                  //     type: 'FIND_OPPONENT_RESPONSE',
-                  //     payload: {
-                  //       matchId: '123',
-                  //       foundOpponent: true,
-                  //       opponentId: 't2_6fgnqav8',
-                  //       opponentUsername: 'badsinn',
-                  //     },
-                  //   });
-                  // }
+                  setCurrentMultiplayerGameId('123');
+                  if (currentUser.userId === 't2_eh5q9bbq') {
+                    // await wait(2);
+                    sendMessageToWebview(context, {
+                      type: 'FIND_OPPONENT_RESPONSE',
+                      payload: {
+                        matchId: '123',
+                        foundOpponent: true,
+                        opponentId: 't2_6fgnqav8',
+                        opponentUsername: 'badsinn',
+                      },
+                    });
+                    break;
+                  }
 
                   // // badsinn
-                  // if (currentUser.userId === 't2_6fgnqav8') {
-                  //   // await wait(3);
-                  //   sendMessageToWebview(context, {
-                  //     type: 'FIND_OPPONENT_RESPONSE',
-                  //     payload: {
-                  //       matchId: '123',
-                  //       foundOpponent: true,
-                  //       opponentId: 't2_eh5q9bbq',
-                  //       opponentUsername: 'aggressive',
-                  //     },
-                  //   });
-                  // }
+                  if (currentUser.userId === 't2_6fgnqav8') {
+                    // await wait(3);
+                    sendMessageToWebview(context, {
+                      type: 'FIND_OPPONENT_RESPONSE',
+                      payload: {
+                        matchId: '123',
+                        foundOpponent: true,
+                        opponentId: 't2_eh5q9bbq',
+                        opponentUsername: 'aggressive',
+                      },
+                    });
+                    break;
+                  }
+
+                  // ....................................................
 
                   const matchmaking_url = await context.settings.get('matchmaking_url');
                   try {
