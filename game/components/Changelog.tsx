@@ -9,6 +9,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog';
+import { ScrollArea } from './ui/scroll-area';
+import { Card, CardContent, CardHeader } from './ui/card';
 
 export default function Changelog() {
   return (
@@ -21,27 +23,40 @@ export default function Changelog() {
           <DialogTitle className="text-xl text-[#fc6] underline underline-offset-2">
             Changelogs
           </DialogTitle>
-          {/* <DialogDescription>General game info</DialogDescription> */}
         </DialogHeader>
-        <div className="flex max-h-60 flex-col items-center overflow-y-auto text-sm text-muted-foreground">
-          <p className="mr-auto">The game offers:</p>
-
-          <ul className="list-disc [&:not(:first-child)]:mt-2">
-            <li>2 Game Modes: Single Player and Multiplayer</li>
-            <li>3 Difficulty Levels: Easy, Medium, Hard</li>
-            <li>1 Optional Timer</li>
-          </ul>
-          <p className="[&:not(:first-child)]:mt-2">
-            You will be presented with a random question based on the chosen difficulty level. Your
-            task is to guess the correct answer/word/phrase (within the time limit, if the timer is
-            enabled).
-          </p>
-          <p className="[&:not(:first-child)]:mt-2">
-            After each round, you can play again or return to the main menu. You can play as many
-            rounds as you want since the game has a large pool of questions for all difficulty
-            levels.
-          </p>
-        </div>
+        <ScrollArea className="rounded-md px-4 pb-2">
+          <div className="flex max-h-60 flex-col items-center text-sm text-muted-foreground">
+            <div className="mr-auto mt-2">
+              <p className="font-bold text-[#fc6]">v0.0.1 - INIT</p>
+              <p className="-mt-1 text-[10px]">17 December, 2024</p>
+            </div>
+            <p className="mr-auto">
+              This version launches the FallWord game to devvit. The game implements:
+            </p>
+            <div className="list-disc [&:not(:first-child)]:my-2">
+              <li>Two Game Modes - Singleplayer and Multiplayer</li>
+              <li>Singleplayer and Multiplayer Leaderboards</li>
+              <li>Realtime multilplayer matches</li>
+              <li>Realtime opponent state updates</li>
+            </div>
+            <Card className="mt-4 max-w-72 border-dashed border-[#fc6]">
+              <CardHeader className="mr-auto p-4 font-bold text-[#fc6]">
+                Updates planned for later verisons
+              </CardHeader>
+              <CardContent>
+                <div className="flex list-disc flex-col flex-wrap [&:not(:first-child)]:my-2">
+                  <li>Multiplayer game history</li>
+                  <li>Sound effects</li>
+                  <li>Game room logic</li>
+                  <li>Private matches</li>
+                  <li>Spectate matches</li>
+                  <li>Better UI/UX</li>
+                  <li>Better error handling</li>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </ScrollArea>
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
             <Button
