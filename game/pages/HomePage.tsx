@@ -41,6 +41,7 @@ export const HomePage = ({
       />
 
       <Snowfall />
+
       <div className="z-50 flex w-[550px] items-center justify-end gap-4">
         <ActiveUsers userCount={usersCount} />
         <Changelog />
