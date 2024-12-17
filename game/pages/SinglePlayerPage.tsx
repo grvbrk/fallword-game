@@ -162,7 +162,7 @@ export const SinglePlayerPage = ({ currentUser }: { currentUser: UserRecord }) =
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-center gap-2 text-2xl text-slate-900">
+            <div className="flex flex-wrap items-center justify-center gap-2 text-2xl text-slate-900">
               {answerLetters.map((letter, idx) => {
                 return (
                   <AlphabetSlot

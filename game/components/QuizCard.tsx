@@ -1,4 +1,4 @@
-import { QuestionType } from '../questions';
+import { QuestionType } from '../questions_prod';
 import { isVowel } from '../utils';
 import { Card } from './ui/card';
 

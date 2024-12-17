@@ -6,6 +6,7 @@ export const REDIS_KEYS = {
   USER_STATS: 'fallword:user_stats', // Stats of all users
   LEADERBOARD_SINGLEPLAYER: 'fallword:leaderboard_singleplayer',
   LEADERBOARD_MULTIPLAYER: 'fallword:leaderboard_multiplayer',
+  MATCHMAKER: 'fallword:matchmaker',
 };
 
 export const REDIS_TTL = {

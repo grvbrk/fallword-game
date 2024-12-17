@@ -19,5 +19,6 @@
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["zoddy"]
+  "cSpell.words": ["zoddy"],
+  "deno.enable": true
 }

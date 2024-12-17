@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { QuestionType } from './questions';
+import { QuestionType } from './questions_prod';
 
 export type MultiplayerQuestion = QuestionType & {
   timeInSeconds: number;

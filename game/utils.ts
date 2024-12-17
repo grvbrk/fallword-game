@@ -1,7 +1,7 @@
 import { UserRecord, WebviewToBlockMessage } from './shared';
 import { ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { questionsList } from './questions';
+import { questionsList } from './questions_prod';
 
 export const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -20,7 +20,12 @@ export function isVowel(char: string): boolean {
 }
 
 export function generateRandomQuestion(difficulty: 'easy' | 'medium' | 'hard') {
-  const filteredList = questionsList.filter((q) => q.difficulty === difficulty);
+  const filteredList = questionsList
+    .filter((q) => q.difficulty === difficulty)
+    .map((q) => ({
+      ...q,
+      answer: q.answer.toUpperCase(),
+    }));
   return filteredList[Math.floor(Math.random() * filteredList.length)];
 }
 
@@ -43,18 +48,21 @@ export function generateMultiplayerQuestions() {
   const shuffledEasy = shuffleArray(easyQuestions).map((q) => {
     return {
       ...q,
+      answer: q.answer.toUpperCase(),
       timeInSeconds: 60,
     };
   });
   const shuffledMedium = shuffleArray(mediumQuestions).map((q) => {
     return {
       ...q,
+      answer: q.answer.toUpperCase(),
       timeInSeconds: 45,
     };
   });
   const shuffledHard = shuffleArray(hardQuestions).map((q) => {
     return {
       ...q,
+      answer: q.answer.toUpperCase(),
       timeInSeconds: 30,
     };
   });
